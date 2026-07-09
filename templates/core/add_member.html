@@ -1,0 +1,62 @@
+{% extends 'core/base.html' %}
+
+{% block title %}ثبت عضو جدید | بیزنس لینک{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h4 class="card-title text-primary">ثبت عضو جدید</h4>
+                <p class="text-muted small">اطلاعات شخص و حوزه فعالیت او را وارد کنید.</p>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="">
+                    {% csrf_token %}
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ form.phone_number.label }}</label>
+                            {{ form.phone_number }}
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-success fw-bold">
+                                {{ form.job_name.label }} (ثبت خودکار شغل جدید)
+                            </label>
+                            {{ form.job_name }}
+                            {% if form.job_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.job_name.errors }}</div>
+                            {% endif %}
+                            <div class="form-text">اگر شغل در سیستم نباشد، خودکار ساخته می‌شود.</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">ثبت اطلاعات</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends 'core/base.html' %}
+
+{% block title %}صفحه اصلی | بیزنس لینک اخمینظ{% endblock %}
+
+{% block content %}
+<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
+    <div class="container-fluid py-3 text-center">
+        <h1 class="display-5 fw-bold text-primary mb-3"> بیزنس لینک</h1>
+
+        {% if not user.is_authenticated %}
+            <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3 px-5">ورود به پنل مدیریت</a>
+        {% else %}
+            <a href="{% url 'dashboard' %}" class="btn btn-success btn-lg mt-3 px-5">ورود به داشبورد</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12 mb-4">
+        <h3 class="border-bottom pb-2">آخرین رویدادها</h3>
+    </div>
+
+    {% for event in events %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title text-dark fw-bold">{{ event.title }}</h5>
+                <p class="card-text text-muted small">{{ event.description|truncatewords:20 }}</p>
+            </div>
+            <div class="card-footer bg-transparent">
+                <small class="text-primary fw-bold">اطلاعات بیشتر به زودی...</small>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+        <p>در حال حاضر رویدادی ثبت نشده است.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'core/base.html' %}
+
+{% block title %}ورود دستیار | بیزنس لینک{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-5">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center pt-3 pb-2">
+                <h5>ورود به پنل بیزنس لینک</h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger small">
+                            نام کاربری یا رمز عبور اشتباه است.
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_username" class="form-label">نام کاربری</label>
+                        <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="id_password" class="form-label">رمز عبور</label>
+                        <input type="password" name="password" class="form-control" id="id_password" required>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">ورود</button>
+                    </div>
+                    <!-- مدیریت ریدایرکت بعد از لاگین -->
+                    <input type="hidden" name="next" value="{{ next|default:'/dashboard/' }}">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

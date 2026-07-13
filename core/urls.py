@@ -1,29 +1,33 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .views import upload_latest_event_gallery
 
 urlpatterns = [
-    # صفحه اصلی عمومی
+    # ==================== صفحه اصلی ====================
     path('', views.home_page, name='home'),
 
-    # احراز هویت
+    # ==================== احراز هویت ====================
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html', next_page='dashboard'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
 
-    # پنل دستیار
+    # ==================== پنل دستیار ====================
     path('dashboard/', views.assistant_dashboard, name='dashboard'),
-    path('members/add/', views.add_member, name='add_member'),
-    path('members/', views.member_list, name='member_list'),
 
-    path('events/', views.event_list, name='event_list'),
-    path('events/add/', views.add_event, name='add_event'),
+    # ==================== مدیریت اعضا ====================
+    path('members/', views.MemberListView.as_view(), name='member_list'),
+    path('members/add/', views.MemberCreateView.as_view(), name='add_member'),
+
+    # ==================== مدیریت مهمانی‌ها ====================
+    path('events/', views.EventListView.as_view(), name='event_list'),
+    path('events/add/', views.EventCreateView.as_view(), name='add_event'),
 
     path('members/', views.MemberListView.as_view(), name='member_list'),
-# urls.py
+    path('members/add/', views.MemberCreateView.as_view(), name='add_member'),
+    path('members/<int:pk>/', views.MemberDetailView.as_view(), name='member_detail'),
+    path('members/<int:pk>/edit/', views.MemberUpdateView.as_view(), name='member_edit'),
 
-    # path('events/', views.events_list, name='events_list'),
-    # path('events/<slug:slug>/', views.event_detail, name='event_detail'),
-    # path('events/<slug:slug>/register/', views.event_register, name='event_register'),
-
+    path('dashboard/event-gallery/upload/', upload_latest_event_gallery, name='upload_latest_event_gallery'),
+    path('dashboard/event-gallery/upload/', upload_latest_event_gallery, name='upload_latest_event_gallery')
 
 ]

@@ -1,41 +1,101 @@
 {% extends 'core/base.html' %}
 
-{% block title %}صفحه اصلی | بیزنس لینک اخمینظ{% endblock %}
+{% block title %}صفحه اصلی | بیزنس لینک{% endblock %}
+
+{% block page_hero %}{% endblock %}
 
 {% block content %}
-<div class="p-5 mb-4 bg-white rounded-3 shadow-sm border">
-    <div class="container-fluid py-3 text-center">
-        <h1 class="display-5 fw-bold text-primary mb-3"> بیزنس لینک</h1>
+<section class="py-4 py-md-5">
+    <div class="row align-items-center g-4 mb-5">
+        <div class="col-12 col-lg-7">
+            <div class="pe-lg-4">
+                <div class="mb-2 text-primary fw-bold">بیزنس لینک</div>
+                <h1 class="fw-bold mb-3" style="font-size: 2rem;">مدیریت رویدادها و ارتباطات اعضا در یک محیط منظم</h1>
+                <p class="text-muted mb-4" style="line-height: 2;">
+                    این سامانه برای ثبت مهمانی‌ها، پیگیری برنامه‌ها و مدیریت اطلاعات اعضا طراحی شده است تا دسترسی به اطلاعات اصلی سریع و روشن باشد.
+                </p>
 
-        {% if not user.is_authenticated %}
-            <a href="{% url 'login' %}" class="btn btn-primary btn-lg mt-3 px-5">ورود به پنل مدیریت</a>
-        {% else %}
-            <a href="{% url 'dashboard' %}" class="btn btn-success btn-lg mt-3 px-5">ورود به داشبورد</a>
-        {% endif %}
-    </div>
-</div>
-
-<div class="row mt-5">
-    <div class="col-12 mb-4">
-        <h3 class="border-bottom pb-2">آخرین رویدادها</h3>
-    </div>
-
-    {% for event in events %}
-    <div class="col-md-4 mb-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title text-dark fw-bold">{{ event.title }}</h5>
-                <p class="card-text text-muted small">{{ event.description|truncatewords:20 }}</p>
+                <div class="d-flex flex-wrap gap-2">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-4">ورود به داشبورد</a>
+                        <a href="{% url 'event_list' %}" class="btn btn-outline-secondary btn-lg px-4">مشاهده مهمانی‌ها</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg px-4">ورود به پنل مدیریت</a>
+                    {% endif %}
+                </div>
             </div>
-            <div class="card-footer bg-transparent">
-                <small class="text-primary fw-bold">اطلاعات بیشتر به زودی...</small>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="section-title mb-3">نمای کلی</div>
+                    <div class="row g-3 text-center">
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border h-100">
+                                <div class="small text-muted mb-1">مهمانی‌های اخیر</div>
+                                <div class="fs-4 fw-bold text-primary">{{ events|length }}</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="p-3 rounded-3 bg-light border h-100">
+                                <div class="small text-muted mb-1">وضعیت سامانه</div>
+                                <div class="fw-bold text-success">فعال</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    {% empty %}
-    <div class="col-12 text-center text-muted py-5">
-        <p>در حال حاضر رویدادی ثبت نشده است.</p>
+
+    <div>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+                <h2 class="section-title mb-1">آخرین مهمانی‌ها</h2>
+                <p class="section-subtitle mb-0">جدیدترین موارد ثبت‌شده در سیستم</p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for event in events %}
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold mb-3">{{ event.title }}</h5>
+
+                            {% if event.description %}
+                                <p class="card-text text-muted mb-3" style="line-height: 1.9;">
+                                    {{ event.description|truncatewords:20 }}
+                                </p>
+                            {% else %}
+                                <p class="card-text text-muted mb-3" style="line-height: 1.9;">
+                                    توضیحی برای این مهمانی ثبت نشده است.
+                                </p>
+                            {% endif %}
+
+                            {% if event.event_date %}
+                                <div class="small text-primary fw-semibold mb-1">
+                                    تاریخ: {{ event.event_date }}
+                                </div>
+                            {% endif %}
+
+                            {% if event.event_time %}
+                                <div class="small text-muted">
+                                    ساعت: {{ event.event_time }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="empty-state border rounded-4 bg-white shadow-sm p-4 text-center">
+                        <p class="mb-0">در حال حاضر مهمانی‌ای ثبت نشده است.</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
-    {% endfor %}
-</div>
+</section>
 {% endblock %}

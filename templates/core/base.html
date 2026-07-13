@@ -1,64 +1,133 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}بیزنس لینک | روابط عمومی اخمین{% endblock %}</title>
+    <title>{% block title %}بیزنس لینک{% endblock %}</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
-    <style>
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #f8f9fa; }
-        .navbar-brand { font-weight: bold; }
-    </style>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">بیزنس لینک </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">صفحه اصلی</a>
-                    </li>
-                    {% if user.is_authenticated %}
+    <div class="app-shell">
+        <nav class="navbar navbar-expand-lg app-navbar sticky-top">
+            <div class="container">
+                <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+                    <span class="brand-badge">BL</span>
+                    <span>بیزنس لینک</span>
+                </a>
+
+                <button
+                    class="navbar-toggler border-0 shadow-none"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav"
+                    aria-controls="navbarNav"
+                    aria-expanded="false"
+                    aria-label="تغییر منو"
+                >
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-3 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'dashboard' %}">داشبورد</a>
+                            <a class="nav-link" href="{% url 'home' %}">صفحه اصلی</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'add_member' %}">ثبت عضو</a>
-                        </li>
-                    {% endif %}
-                </ul>
-                <div class="d-flex">
-                    {% if user.is_authenticated %}
-                        <span class="navbar-text text-white me-3">سلام، {{ user.username }}</span>
-                        <form action="{% url 'logout' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-danger btn-sm">خروج</button>
-                        </form>
-                    {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-primary btn-sm">ورود دستیار</a>
-                    {% endif %}
+
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'dashboard' %}">داشبورد</a>
+                            </li>
+
+                            {% if request.resolver_match.url_name != 'home' %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'member_list' %}">اعضا</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'add_member' %}">ثبت عضو</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'event_list' %}">رویدادها</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" href="{% url 'add_event' %}">ثبت رویداد</a>
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {% if user.is_authenticated %}
+                            <div class="user-chip">
+                                <span class="user-chip-label">سلام</span>
+                                <strong>{{ user.username }}</strong>
+                            </div>
+
+                            <form action="{% url 'logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-light btn-sm px-3">خروج</button>
+                            </form>
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm px-3">ورود</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
+        </nav>
 
-    <div class="container pb-5">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        {% block page_hero %}
+            <header class="page-hero">
+                <div class="container">
+                    <div class="page-hero-content">
+                        <p class="page-hero-kicker mb-2">شبکه‌سازی حرفه‌ای</p>
+                        <h1 class="page-hero-title mb-2">
+                            {% block page_heading %}مدیریت هوشمند اعضا و رویدادها{% endblock %}
+                        </h1>
+                        <p class="page-hero-text mb-0">
+                            {% block page_subtitle %}یک تجربه تمیز، سریع و منظم برای مدیریت بیزنس لینک{% endblock %}
+                        </p>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-        {% block content %}{% endblock %}
+            </header>
+        {% endblock %}
+
+        <main class="main-content">
+            <div class="container pb-5">
+                {% if messages %}
+                    <div class="messages-stack">
+                        {% for message in messages %}
+                            <div class="alert app-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                                <div class="fw-semibold mb-1">
+                                    {% if message.tags == 'success' %}
+                                        عملیات موفق
+                                    {% elif message.tags == 'error' %}
+                                        خطا
+                                    {% elif message.tags == 'warning' %}
+                                        توجه
+                                    {% else %}
+                                        اطلاعیه
+                                    {% endif %}
+                                </div>
+
+                                <div>{{ message }}</div>
+
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

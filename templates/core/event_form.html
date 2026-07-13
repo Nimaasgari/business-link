@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+
+{% block title %}ایجاد مهمانی جدید{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">ایجاد مهمانی جدید</h5>
+                </div>
+                <div class="card-body">
+
+                    <form
+                        method="post"
+                        action="{% url 'add_event' %}"
+                        hx-post="{% url 'add_event' %}"
+                        hx-target="#form-result"
+                        hx-swap="innerHTML">
+
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">{{ form.name.label }}</label>
+                                {{ form.name }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.city.label }}</label>
+                                {{ form.city }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.venue_name.label }}</label>
+                                {{ form.venue_name }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.event_date.label }}</label>
+                                {{ form.event_date }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">{{ form.event_time.label }}</label>
+                                {{ form.event_time }}
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                ثبت مهمانی
+                            </button>
+                        </div>
+                    </form>
+
+                    <div id="form-result" class="mt-3"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

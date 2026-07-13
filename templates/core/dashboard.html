@@ -6,19 +6,18 @@
 <div class="row mb-4">
     <div class="col-12">
         <h2 class="mb-2">داشبورد دستیار</h2>
-        <p class="text-muted">نمای کلی از وضعیت سیستم بیزنس لینک</p>
+        <p class="text-muted mb-0">نمای کلی از وضعیت سیستم بیزنس لینک</p>
     </div>
 </div>
 
-<div class="row">
-    <!-- کارت اعضا -->
-    <div class="col-md-6 mb-4">
-        <div class="card text-bg-primary shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                <h5 class="card-title">کل اعضای ثبت شده</h5>
-                <h1 class="display-4 fw-bold">{{ members_count }}</h1>
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-6">
+        <div class="card text-bg-primary shadow-sm h-100 border-0">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
+                <h5 class="card-title mb-3">کل اعضای ثبت شده</h5>
+                <h1 class="display-4 fw-bold mb-3">{{ members_count }}</h1>
 
-                <div class="mt-3 d-flex gap-2 flex-wrap justify-content-center">
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
                     <a href="{% url 'member_list' %}" class="btn btn-light text-primary fw-bold">
                         نمایش لیست افراد
                     </a>
@@ -30,17 +29,110 @@
         </div>
     </div>
 
-    <!-- کارت رویدادها -->
-    <div class="col-md-6 mb-4">
-        <div class="card text-bg-success shadow-sm h-100">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center">
-                <h5 class="card-title">کل رویدادها (مهمانی‌ها)</h5>
-                <h1 class="display-4 fw-bold">{{ events_count }}</h1>
+    <div class="col-12 col-lg-6">
+        <div class="card text-bg-success shadow-sm h-100 border-0">
+            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
+                <h5 class="card-title mb-3">کل رویدادها (مهمانی‌ها)</h5>
+                <h1 class="display-4 fw-bold mb-3">{{ events_count }}</h1>
 
-                <div class="mt-3 d-flex gap-2 flex-wrap justify-content-center">
-                    <a href="#" class="btn btn-light text-success fw-bold">لیست مهمانی‌ها</a>
-                    <a href="#" class="btn btn-outline-light fw-bold">ایجاد مهمانی جدید</a>
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
+                    <a href="{% url 'event_list' %}" class="btn btn-light text-success fw-bold">
+                        لیست مهمانی‌ها
+                    </a>
+                    <a href="{% url 'add_event' %}" class="btn btn-outline-light fw-bold">
+                        ایجاد مهمانی جدید
+                    </a>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-xl-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body p-4">
+                <h4 class="fw-bold mb-3">آخرین رویداد برگزارشده</h4>
+
+                {% if latest_completed_event %}
+                    <div class="border rounded-3 p-3 bg-light mb-4">
+                        <div class="fw-bold fs-5 mb-2">{{ latest_completed_event.name }}</div>
+                        <div class="text-muted small mb-1">شهر: {{ latest_completed_event.city }}</div>
+                        <div class="text-muted small mb-1">مکان برگزاری: {{ latest_completed_event.venue_name }}</div>
+                        <div class="text-muted small mb-1">تاریخ: {{ latest_completed_event.event_date }}</div>
+                        <div class="text-muted small mb-0">ساعت: {{ latest_completed_event.event_time }}</div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3">بارگذاری عکس‌های این رویداد</h5>
+
+                    <form method="post" action="{% url 'upload_latest_event_gallery' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="{{ gallery_form.images.id_for_label }}" class="form-label fw-semibold">
+                                انتخاب عکس‌ها
+                            </label>
+                            {{ gallery_form.images }}
+                            {% if gallery_form.images.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ gallery_form.images.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary px-4">
+                            ثبت عکس‌های رویداد
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="alert alert-warning mb-0">
+                        هنوز رویداد برگزارشده‌ای برای ثبت عکس پیدا نشد.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                    <div>
+                        <h4 class="fw-bold mb-1">عکس‌های آخرین رویداد</h4>
+                        {% if latest_completed_event %}
+                            <p class="text-muted mb-0 small">
+                                {{ latest_completed_event.name }} | {{ latest_completed_event.city }} | {{ latest_completed_event.event_date }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if latest_event_gallery %}
+                    <div class="row g-3">
+                        {% for item in latest_event_gallery %}
+                            <div class="col-6 col-md-4">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <img
+                                        src="{{ item.image.url }}"
+                                        alt="{{ item.title }}"
+                                        class="img-fluid rounded-top"
+                                        style="height: 180px; object-fit: cover;"
+                                    >
+                                    <div class="card-body p-3">
+                                        <div class="fw-semibold small mb-1">{{ item.title }}</div>
+                                        {% if item.city %}
+                                            <div class="text-muted small">{{ item.city }}</div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="border rounded-3 p-4 text-center text-muted bg-light">
+                        هنوز عکسی برای آخرین رویداد ثبت نشده است.
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

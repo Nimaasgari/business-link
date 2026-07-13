@@ -1,0 +1,68 @@
+{% extends 'core/base.html' %}
+
+{% block title %}ویرایش عضو | بیزنس لینک{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-2 px-md-3">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">ویرایش عضو</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">{{ form.first_name.label }}</label>
+                                {{ form.first_name }}
+                                <div class="text-danger small">{{ form.first_name.errors }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">{{ form.last_name.label }}</label>
+                                {{ form.last_name }}
+                                <div class="text-danger small">{{ form.last_name.errors }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">{{ form.phone_number.label }}</label>
+                                {{ form.phone_number }}
+                                <div class="text-danger small">{{ form.phone_number.errors }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">{{ form.job_category.label }}</label>
+                                {{ form.job_category }}
+                                <div class="text-danger small">{{ form.job_category.errors }}</div>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label class="form-label">{{ form.job_name.label }}</label>
+                                {{ form.job_name }}
+                                <small class="form-text text-muted">
+                                    اگر حوزه جدید وارد شود، همان ثبت و جایگزین می‌شود.
+                                </small>
+                                <div class="text-danger small">{{ form.job_name.errors }}</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary">ذخیره تغییرات</button>
+                            <a href="{% url 'member_detail' member.pk %}" class="btn btn-outline-secondary">انصراف</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

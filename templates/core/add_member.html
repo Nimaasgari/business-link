@@ -3,60 +3,163 @@
 {% block title %}ثبت عضو جدید | بیزنس لینک{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
-                <h4 class="card-title text-primary">ثبت عضو جدید</h4>
-                <p class="text-muted small">اطلاعات شخص و حوزه فعالیت او را وارد کنید.</p>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="">
-                    {% csrf_token %}
+<div class="container-fluid px-2 px-sm-3 px-md-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-sm-11 col-md-10 col-lg-8 col-xl-7">
+            <div class="card member-card shadow-sm border-0 my-3 my-md-4">
+                <div class="card-header bg-white border-bottom-0 pt-3 pt-md-4 pb-0 px-3 px-md-4">
+                    <h4 class="card-title text-primary mb-1 fs-5 fs-md-4">ثبت عضو جدید</h4>
+                    <p class="text-muted small mb-0">
+                        اطلاعات عضو را وارد کنید. می‌توانید حوزه فعالیت را از لیست انتخاب کنید یا حوزه جدید ثبت کنید.
+                    </p>
+                </div>
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">{{ form.first_name.label }}</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}
-                                <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">{{ form.last_name.label }}</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}
-                                <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
+                <div class="card-body px-3 px-md-4 py-3 py-md-4">
+                    <form method="post" novalidate id="memberForm">
+                        {% csrf_token %}
 
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label class="form-label">{{ form.phone_number.label }}</label>
-                            {{ form.phone_number }}
-                            {% if form.phone_number.errors %}
-                                <div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>
-                            {% endif %}
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label text-success fw-bold">
-                                {{ form.job_name.label }} (ثبت خودکار شغل جدید)
-                            </label>
-                            {{ form.job_name }}
-                            {% if form.job_name.errors %}
-                                <div class="text-danger small mt-1">{{ form.job_name.errors }}</div>
-                            {% endif %}
-                            <div class="form-text">اگر شغل در سیستم نباشد، خودکار ساخته می‌شود.</div>
-                        </div>
-                    </div>
+                        {# خطاهای کلی فرم #}
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger py-2 px-3 small mb-3">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
 
-                    <div class="d-grid mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">ثبت اطلاعات</button>
-                    </div>
-                </form>
+                        <div class="row g-3">
+                            <!-- نام -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- نام خانوادگی -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- شماره تماس -->
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">{{ form.phone_number.label }}</label>
+                                {{ form.phone_number }}
+                                <div class="form-text">فرمت معتبر: 09123456789</div>
+                                {% if form.phone_number.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- انتخاب حوزه از لیست -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold">{{ form.job_category.label }}</label>
+                                {{ form.job_category }}
+                                {% if form.job_category.errors %}
+                                    <div class="text-danger small mt-1">{{ form.job_category.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- یا حوزه جدید -->
+                            <div class="col-12 col-md-6">
+                                <label class="form-label fw-semibold text-success">
+                                    {{ form.job_name.label }}
+                                </label>
+                                {{ form.job_name }}
+                                <div class="form-text">اگر حوزه در لیست نبود، اینجا وارد کنید تا خودکار ساخته شود.</div>
+                                {% if form.job_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.job_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- راهنمای هوشمند -->
+                        <div id="jobHint" class="alert alert-light border small mt-3 mb-0 py-2 px-3 d-none"></div>
+
+                        <div class="d-grid d-sm-flex justify-content-sm-end gap-2 mt-4">
+                            <a href="{% url 'member_list' %}" class="btn btn-outline-secondary order-2 order-sm-1">
+                                انصراف
+                            </a>
+                            <button type="submit" class="btn btn-primary order-1 order-sm-2 px-4">
+                                ثبت اطلاعات
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    /* Mobile-first tweaks */
+    .member-card {
+        border-radius: 14px;
+    }
+
+    .form-control,
+    .form-select {
+        min-height: 44px; /* لمس راحت روی موبایل */
+        font-size: .95rem;
+    }
+
+    .btn {
+        min-height: 44px;
+    }
+
+    @media (max-width: 575.98px) {
+        .card-title {
+            font-size: 1.05rem !important;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .member-card {
+            border-radius: 16px;
+        }
+    }
+
+    /* خطای زیباتر برای فیلدها */
+    .text-danger ul {
+        margin: 0;
+        padding-right: 1rem;
+    }
+</style>
+
+<script>
+    (function () {
+        const jobCategory = document.getElementById("id_job_category");
+        const jobName = document.getElementById("id_job_name");
+        const hintBox = document.getElementById("jobHint");
+
+        if (!jobCategory || !jobName || !hintBox) return;
+
+        function updateHint() {
+            const hasCategory = !!jobCategory.value;
+            const hasJobName = !!jobName.value.trim();
+
+            if (hasCategory && hasJobName) {
+                hintBox.className = "alert alert-warning border small mt-3 mb-0 py-2 px-3";
+                hintBox.textContent = "هم حوزه انتخاب شده و هم حوزه جدید وارد شده است. اولویت با «حوزه جدید» خواهد بود.";
+            } else if (hasCategory) {
+                hintBox.className = "alert alert-info border small mt-3 mb-0 py-2 px-3";
+                hintBox.textContent = "حوزه فعالیت از لیست انتخاب شده است.";
+            } else if (hasJobName) {
+                hintBox.className = "alert alert-success border small mt-3 mb-0 py-2 px-3";
+                hintBox.textContent = "حوزه جدید ثبت خواهد شد و برای دفعات بعد در لیست نمایش داده می‌شود.";
+            } else {
+                hintBox.className = "alert alert-light border small mt-3 mb-0 py-2 px-3";
+                hintBox.textContent = "یک حوزه از لیست انتخاب کنید یا حوزه جدید وارد کنید.";
+            }
+            hintBox.classList.remove("d-none");
+        }
+
+        jobCategory.addEventListener("change", updateHint);
+        jobName.addEventListener("input", updateHint);
+        updateHint();
+    })();
+</script>
 {% endblock %}

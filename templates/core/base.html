@@ -1,133 +1,505 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}بیزنس لینک{% endblock %}</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
-    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.0.0/Vazirmatn-font-face.css" rel="stylesheet" type="text/css">
+    <!-- Vazirmatn -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+
+    <!-- Bootstrap RTL -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.rtl.min.css">
+
+    <!-- Material Symbols -->
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1">
+
+    <!-- Project CSS -->
     <link rel="stylesheet" href="{% static 'css/base.css' %}">
+
+    <style>
+        :root {
+            --app-bg: #f4f6fb;
+            --app-surface: rgba(17, 24, 39, 0.94);
+            --app-surface-border: rgba(255, 255, 255, 0.08);
+
+            --app-text: #ffffff;
+            --app-text-soft: rgba(255, 255, 255, 0.72);
+
+            --app-primary: #3b82f6;
+            --app-primary-dark: #2563eb;
+
+            --app-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+            --app-radius-sm: 10px;
+            --app-radius-md: 14px;
+
+            --app-transition: all 0.2s ease;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+            background: var(--app-bg);
+            font-family: Vazirmatn, sans-serif;
+        }
+
+        body {
+            color: #111827;
+        }
+
+        a,
+        button {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .app-shell {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navbar */
+        .app-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: var(--app-surface);
+            border-bottom: 1px solid var(--app-surface-border);
+            box-shadow: var(--app-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .app-navbar .container {
+            max-width: 1280px;
+        }
+
+        .app-navbar-inner {
+            min-height: 54px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 0;
+            gap: 0.75rem;
+        }
+
+        .app-navbar-inner.has-user-actions {
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            color: var(--app-text);
+            text-decoration: none;
+            font-size: 0.92rem;
+            font-weight: 800;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .navbar-brand:hover {
+            color: #ffffff;
+            opacity: 0.95;
+        }
+
+        .brand-badge {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            border-radius: 9px;
+            background: linear-gradient(
+                135deg,
+                var(--app-primary) 0%,
+                var(--app-primary-dark) 100%
+            );
+
+            color: #ffffff;
+            font-size: 0.78rem;
+            font-weight: 900;
+            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.35);
+        }
+
+        .app-navbar-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.4rem;
+        }
+
+        .user-chip {
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+
+            padding: 0.3rem 0.55rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--app-text);
+
+            font-size: 0.7rem;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .user-chip-label {
+            color: var(--app-text-soft);
+            font-size: 0.64rem;
+        }
+
+        .user-chip strong {
+            display: inline-block;
+            max-width: 90px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .btn-app-action {
+            min-height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 0.32rem 0.6rem;
+            border-radius: var(--app-radius-sm);
+
+            font-size: 0.7rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-decoration: none;
+
+            transition: var(--app-transition);
+        }
+
+        .btn-app-action.btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.22);
+            color: #ffffff;
+            background: transparent;
+        }
+
+        .btn-app-action.btn-outline-light:hover,
+        .btn-app-action.btn-outline-light:focus {
+            border-color: rgba(255, 255, 255, 0.38);
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .btn-app-action.btn-primary {
+            border: 0;
+            color: #ffffff;
+            background: linear-gradient(
+                135deg,
+                var(--app-primary) 0%,
+                var(--app-primary-dark) 100%
+            );
+        }
+
+        .btn-app-action.btn-primary:hover,
+        .btn-app-action.btn-primary:focus {
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 0.65rem 0 1rem;
+        }
+
+        .messages-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .app-alert {
+            margin-bottom: 0;
+            border: 0;
+            border-radius: var(--app-radius-md);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+            font-size: 0.82rem;
+        }
+
+        .app-alert .btn-close {
+            margin-left: 0;
+            margin-right: auto;
+        }
+
+        /* Mobile */
+        @media (max-width: 575.98px) {
+            .app-navbar .container {
+                padding-left: 0.65rem;
+                padding-right: 0.65rem;
+            }
+
+            .app-navbar-inner {
+                min-height: 48px;
+                padding: 0.35rem 0;
+                gap: 0.45rem;
+            }
+
+            .navbar-brand {
+                font-size: 0.78rem;
+            }
+
+            .brand-badge {
+                width: 29px;
+                height: 29px;
+                border-radius: 8px;
+                font-size: 0.7rem;
+            }
+
+            .app-navbar-actions {
+                gap: 0.3rem;
+            }
+
+            .user-chip {
+                min-height: 29px;
+                padding: 0.25rem 0.45rem;
+                font-size: 0.63rem;
+            }
+
+            .user-chip-label {
+                font-size: 0.58rem;
+            }
+
+            .user-chip strong {
+                max-width: 65px;
+            }
+
+            .btn-app-action {
+                min-height: 29px;
+                padding: 0.25rem 0.48rem;
+                border-radius: 8px;
+                font-size: 0.62rem;
+            }
+
+            .main-content {
+                padding-top: 0.45rem;
+            }
+
+            .messages-stack {
+                gap: 0.45rem;
+                margin-bottom: 0.55rem;
+            }
+
+            .app-alert {
+                border-radius: 11px;
+                font-size: 0.7rem;
+                padding: 0.55rem 0.65rem;
+            }
+        }
+
+        @media (max-width: 359.98px) {
+            .navbar-brand {
+                font-size: 0.73rem;
+            }
+
+            .brand-badge {
+                width: 27px;
+                height: 27px;
+                font-size: 0.64rem;
+            }
+
+            .user-chip-label {
+                display: none;
+            }
+
+            .user-chip strong {
+                max-width: 58px;
+            }
+
+            .btn-app-action {
+                font-size: 0.59rem;
+                padding-left: 0.4rem;
+                padding-right: 0.4rem;
+            }
+        }
+
+        /* Tablet and Desktop */
+        @media (min-width: 576px) {
+            .app-navbar-inner {
+                min-height: 62px;
+                padding: 0.65rem 0;
+            }
+
+            .navbar-brand {
+                font-size: 0.98rem;
+            }
+
+            .brand-badge {
+                width: 36px;
+                height: 36px;
+                border-radius: 10px;
+                font-size: 0.85rem;
+            }
+
+            .user-chip {
+                min-height: 35px;
+                padding: 0.4rem 0.65rem;
+                font-size: 0.76rem;
+            }
+
+            .user-chip-label {
+                font-size: 0.68rem;
+            }
+
+            .btn-app-action {
+                min-height: 35px;
+                padding: 0.42rem 0.75rem;
+                border-radius: 10px;
+                font-size: 0.76rem;
+            }
+
+            .main-content {
+                padding-top: 0.8rem;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .app-navbar-inner {
+                min-height: 70px;
+                padding: 0.8rem 0;
+            }
+
+            .navbar-brand {
+                font-size: 1.05rem;
+            }
+
+            .brand-badge {
+                width: 40px;
+                height: 40px;
+                font-size: 0.95rem;
+                border-radius: 11px;
+            }
+
+            .user-chip {
+                min-height: 38px;
+                font-size: 0.8rem;
+            }
+
+            .btn-app-action {
+                min-height: 38px;
+                padding: 0.5rem 0.9rem;
+                font-size: 0.82rem;
+            }
+
+            .main-content {
+                padding-top: 0.95rem;
+            }
+        }
+    </style>
 
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
-    <div class="app-shell">
-        <nav class="navbar navbar-expand-lg app-navbar sticky-top">
-            <div class="container">
-                <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'home' %}">
+<div class="app-shell">
+
+    <nav class="app-navbar">
+        <div class="container">
+            <div class="app-navbar-inner {% if request.resolver_match and request.resolver_match.url_name == 'dashboard' %}has-user-actions{% endif %}">
+
+                <!-- Brand -->
+                <a class="navbar-brand"
+                   href="{% url 'dashboard' %}"
+                   aria-label="بازگشت به داشبورد">
                     <span class="brand-badge">BL</span>
                     <span>بیزنس لینک</span>
                 </a>
 
-                <button
-                    class="navbar-toggler border-0 shadow-none"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="تغییر منو"
-                >
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto mb-3 mb-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'home' %}">صفحه اصلی</a>
-                        </li>
-
-                        {% if user.is_authenticated %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'dashboard' %}">داشبورد</a>
-                            </li>
-
-                            {% if request.resolver_match.url_name != 'home' %}
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'member_list' %}">اعضا</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'add_member' %}">ثبت عضو</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'event_list' %}">رویدادها</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{% url 'add_event' %}">ثبت رویداد</a>
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    </ul>
-
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                <!-- فقط در داشبورد -->
+                {% if request.resolver_match and request.resolver_match.url_name == 'dashboard' %}
+                    <div class="app-navbar-actions">
                         {% if user.is_authenticated %}
                             <div class="user-chip">
-                                <span class="user-chip-label">سلام</span>
-                                <strong>{{ user.username }}</strong>
+                                <span class="user-chip-label">کاربر:</span>
+                                <strong title="{{ user.username }}">
+                                    {{ user.username }}
+                                </strong>
                             </div>
 
-                            <form action="{% url 'logout' %}" method="post" class="d-inline">
+                            <form action="{% url 'logout' %}" method="post" class="m-0">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-outline-light btn-sm px-3">خروج</button>
+                                <button type="submit" class="btn btn-outline-light btn-app-action">
+                                    خروج
+                                </button>
                             </form>
                         {% else %}
-                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm px-3">ورود</a>
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-app-action">
+                                ورود
+                            </a>
                         {% endif %}
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        {% block page_hero %}
-            <header class="page-hero">
-                <div class="container">
-                    <div class="page-hero-content">
-                        <p class="page-hero-kicker mb-2">شبکه‌سازی حرفه‌ای</p>
-                        <h1 class="page-hero-title mb-2">
-                            {% block page_heading %}مدیریت هوشمند اعضا و رویدادها{% endblock %}
-                        </h1>
-                        <p class="page-hero-text mb-0">
-                            {% block page_subtitle %}یک تجربه تمیز، سریع و منظم برای مدیریت بیزنس لینک{% endblock %}
-                        </p>
-                    </div>
-                </div>
-            </header>
-        {% endblock %}
-
-        <main class="main-content">
-            <div class="container pb-5">
-                {% if messages %}
-                    <div class="messages-stack">
-                        {% for message in messages %}
-                            <div class="alert app-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-                                <div class="fw-semibold mb-1">
-                                    {% if message.tags == 'success' %}
-                                        عملیات موفق
-                                    {% elif message.tags == 'error' %}
-                                        خطا
-                                    {% elif message.tags == 'warning' %}
-                                        توجه
-                                    {% else %}
-                                        اطلاعیه
-                                    {% endif %}
-                                </div>
-
-                                <div>{{ message }}</div>
-
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="بستن"></button>
-                            </div>
-                        {% endfor %}
                     </div>
                 {% endif %}
 
-                {% block content %}{% endblock %}
             </div>
-        </main>
-    </div>
+        </div>
+    </nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
+    <main class="main-content">
+        <div class="container-fluid px-2 px-sm-3 px-lg-4 px-xl-5">
+
+            {% if messages %}
+                <div class="messages-stack">
+                    {% for message in messages %}
+                        <div class="alert app-alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+                             role="alert">
+                            <div class="fw-semibold mb-1">
+                                {% if message.tags == 'success' %}
+                                    عملیات موفق
+                                {% elif message.tags == 'error' %}
+                                    خطا
+                                {% elif message.tags == 'warning' %}
+                                    توجه
+                                {% else %}
+                                    اطلاعیه
+                                {% endif %}
+                            </div>
+
+                            <div>{{ message }}</div>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="alert"
+                                    aria-label="بستن"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -1,224 +1,107 @@
-:root {
-    --app-bg: #f8fafc;
-    --app-surface: #ffffff;
-    --app-surface-soft: #f1f5f9;
-    --app-border: #e2e8f0;
-    --app-text: #0f172a;
-    --app-text-soft: #475569;
-    --app-primary: #1d4ed8;
-    --app-primary-dark: #1e3a8a;
-    --app-accent: #0f766e;
-    --app-warning: #f59e0b;
-    --app-danger: #dc2626;
-    --app-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-    --app-radius: 18px;
+/* Event List */
+.event-card {
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-html,
-body {
-    min-height: 100%;
+.event-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(24, 39, 75, 0.1) !important;
 }
 
-body {
-    font-family: 'Vazirmatn', sans-serif;
-    background: linear-gradient(180deg, #f8fafc 0%, #eef4ff 100%);
-    color: var(--app-text);
+.event-card__details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.7rem;
 }
 
-a {
-    text-decoration: none;
-}
-
-.app-navbar {
-    background: rgba(15, 23, 42, 0.92);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
-}
-
-.navbar-brand {
-    font-weight: 800;
-    color: #fff !important;
-    letter-spacing: -0.3px;
-}
-
-.brand-badge {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    display: inline-flex;
+.event-card__detail {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-accent) 100%);
-    color: #fff;
-    font-size: 0.95rem;
-    font-weight: 800;
-    box-shadow: 0 8px 18px rgba(29, 78, 216, 0.3);
+    gap: 0.45rem;
+    min-width: 0;
+    color: var(--bs-secondary-color);
+    font-size: 0.85rem;
 }
 
-.app-navbar .nav-link {
-    color: rgba(255, 255, 255, 0.82);
-    font-weight: 500;
-    transition: 0.2s ease;
+.event-card__detail i {
+    flex: 0 0 auto;
+    font-size: 1rem;
 }
 
-.app-navbar .nav-link:hover,
-.app-navbar .nav-link:focus {
-    color: #fff;
-}
-
-.user-chip {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 999px;
-    padding: 0.5rem 0.9rem;
-    font-size: 0.9rem;
-}
-
-.user-chip-label {
-    opacity: 0.8;
-    margin-left: 0.35rem;
-}
-
-.page-hero {
-    padding: 2rem 0 1.5rem;
-}
-
-.page-hero-content {
-    background: linear-gradient(135deg, rgba(29, 78, 216, 0.08) 0%, rgba(15, 118, 110, 0.08) 100%);
-    border: 1px solid rgba(226, 232, 240, 0.9);
-    border-radius: 24px;
-    padding: 1.5rem 1.25rem;
-    box-shadow: var(--app-shadow);
-}
-
-.page-hero-kicker {
-    color: var(--app-primary);
-    font-size: 0.88rem;
-    font-weight: 700;
-}
-
-.page-hero-title {
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--app-text);
-}
-
-.page-hero-text {
-    color: var(--app-text-soft);
-    max-width: 720px;
-    line-height: 1.9;
-}
-
-.main-content {
-    padding-bottom: 2rem;
-}
-
-.messages-stack {
-    margin-bottom: 1rem;
-}
-
-.app-alert {
-    border: 0;
-    border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
-}
-
-.card {
-    border: 1px solid var(--app-border);
-    border-radius: var(--app-radius);
-    box-shadow: var(--app-shadow);
-}
-
-.card-header {
-    border-bottom: 1px solid var(--app-border);
-    border-top-right-radius: var(--app-radius) !important;
-    border-top-left-radius: var(--app-radius) !important;
-}
-
-.table {
-    --bs-table-bg: transparent;
-}
-
-.table thead th {
-    color: var(--app-text-soft);
-    font-weight: 700;
+.event-card__detail span {
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.table tbody td {
-    vertical-align: middle;
+.empty-state-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    font-size: 1.8rem;
 }
 
-.form-control,
-.form-select {
-    min-height: 48px;
-    border-radius: 14px;
-    border: 1px solid var(--app-border);
-    box-shadow: none !important;
+.completed-events-section__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.75rem;
+    color: var(--bs-success);
+    background-color: rgba(var(--bs-success-rgb), 0.12);
+    font-size: 1.25rem;
 }
 
-.form-control:focus,
-.form-select:focus {
-    border-color: rgba(29, 78, 216, 0.45);
-    box-shadow: 0 0 0 0.2rem rgba(29, 78, 216, 0.12) !important;
+.completed-city-card {
+    border-radius: 0.9rem;
+    overflow: hidden;
 }
 
-.btn {
-    border-radius: 12px;
-    font-weight: 600;
+.completed-city-card .card-header {
+    border-bottom: 1px solid var(--bs-border-color);
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--app-primary) 0%, var(--app-primary-dark) 100%);
-    border: 0;
+/* برای جلوگیری از خارج‌زدن محتوا در Flex */
+.min-w-0 {
+    min-width: 0;
 }
 
-.btn-primary:hover,
-.btn-primary:focus {
-    background: linear-gradient(135deg, #1b46c2 0%, #1d3577 100%);
-}
-
-.btn-outline-secondary,
-.btn-outline-warning,
-.btn-outline-info,
-.btn-outline-danger {
-    border-width: 1px;
-}
-
-.badge {
-    border-radius: 999px;
-    padding: 0.55em 0.85em;
-}
-
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--app-text);
-}
-
-.section-subtitle {
-    color: var(--app-text-soft);
-    font-size: 0.95rem;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: var(--app-text-soft);
-}
-
-@media (max-width: 991.98px) {
-    .page-hero {
-        padding-top: 1.25rem;
+/* موبایل‌های کوچک */
+@media (max-width: 575.98px) {
+    .event-list-page {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
     }
 
-    .page-hero-title {
-        font-size: 1.25rem;
+    .event-card__details {
+        grid-template-columns: 1fr;
+        gap: 0.55rem;
     }
 
-    .page-hero-content {
-        padding: 1.25rem 1rem;
-        border-radius: 20px;
+    .event-card .card-body {
+        padding: 1rem;
+    }
+
+    .pagination .page-link {
+        padding: 0.4rem 0.65rem;
+    }
+}
+
+/* احترام به تنظیمات کاربران برای کاهش انیمیشن */
+@media (prefers-reduced-motion: reduce) {
+    .event-card {
+        transition: none;
+    }
+
+    .event-card:hover {
+        transform: none;
     }
 }

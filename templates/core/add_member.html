@@ -3,163 +3,737 @@
 {% block title %}ثبت عضو جدید | بیزنس لینک{% endblock %}
 
 {% block content %}
-<div class="container-fluid px-2 px-sm-3 px-md-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-sm-11 col-md-10 col-lg-8 col-xl-7">
-            <div class="card member-card shadow-sm border-0 my-3 my-md-4">
-                <div class="card-header bg-white border-bottom-0 pt-3 pt-md-4 pb-0 px-3 px-md-4">
-                    <h4 class="card-title text-primary mb-1 fs-5 fs-md-4">ثبت عضو جدید</h4>
-                    <p class="text-muted small mb-0">
-                        اطلاعات عضو را وارد کنید. می‌توانید حوزه فعالیت را از لیست انتخاب کنید یا حوزه جدید ثبت کنید.
-                    </p>
-                </div>
+<div class="member-create-page">
+    <div class="container-fluid px-2 px-sm-3 px-md-4">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-11 col-md-10 col-lg-8 col-xl-7 col-xxl-6">
 
-                <div class="card-body px-3 px-md-4 py-3 py-md-4">
-                    <form method="post" novalidate id="memberForm">
-                        {% csrf_token %}
+                <section class="card member-card border-0 shadow-sm">
 
-                        {# خطاهای کلی فرم #}
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger py-2 px-3 small mb-3">
-                                {{ form.non_field_errors }}
-                            </div>
-                        {% endif %}
+                    <!-- Header -->
+                    <header class="card-header member-card-header bg-white border-0">
+                        <div class="member-header">
 
-                        <div class="row g-3">
-                            <!-- نام -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">{{ form.first_name.label }}</label>
-                                {{ form.first_name }}
-                                {% if form.first_name.errors %}
-                                    <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- نام خانوادگی -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">{{ form.last_name.label }}</label>
-                                {{ form.last_name }}
-                                {% if form.last_name.errors %}
-                                    <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- شماره تماس -->
-                            <div class="col-12">
-                                <label class="form-label fw-semibold">{{ form.phone_number.label }}</label>
-                                {{ form.phone_number }}
-                                <div class="form-text">فرمت معتبر: 09123456789</div>
-                                {% if form.phone_number.errors %}
-                                    <div class="text-danger small mt-1">{{ form.phone_number.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- انتخاب حوزه از لیست -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold">{{ form.job_category.label }}</label>
-                                {{ form.job_category }}
-                                {% if form.job_category.errors %}
-                                    <div class="text-danger small mt-1">{{ form.job_category.errors }}</div>
-                                {% endif %}
-                            </div>
-
-                            <!-- یا حوزه جدید -->
-                            <div class="col-12 col-md-6">
-                                <label class="form-label fw-semibold text-success">
-                                    {{ form.job_name.label }}
-                                </label>
-                                {{ form.job_name }}
-                                <div class="form-text">اگر حوزه در لیست نبود، اینجا وارد کنید تا خودکار ساخته شود.</div>
-                                {% if form.job_name.errors %}
-                                    <div class="text-danger small mt-1">{{ form.job_name.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- راهنمای هوشمند -->
-                        <div id="jobHint" class="alert alert-light border small mt-3 mb-0 py-2 px-3 d-none"></div>
-
-                        <div class="d-grid d-sm-flex justify-content-sm-end gap-2 mt-4">
-                            <a href="{% url 'member_list' %}" class="btn btn-outline-secondary order-2 order-sm-1">
-                                انصراف
+                            <a href="{% url 'dashboard' %}"
+                               class="back-icon-btn"
+                               aria-label="بازگشت به داشبورد"
+                               title="بازگشت به داشبورد">
+                                <span class="material-symbols-outlined">arrow_forward</span>
                             </a>
-                            <button type="submit" class="btn btn-primary order-1 order-sm-2 px-4">
-                                ثبت اطلاعات
-                            </button>
+
+                            <div class="member-header-content">
+                                <h1 class="member-title text-primary mb-1">
+                                    ثبت عضو جدید
+                                </h1>
+
+                                <p class="member-subtitle text-muted mb-0">
+                                    اطلاعات عضو را وارد کنید. حوزه فعالیت را از لیست انتخاب کنید یا حوزه جدید ثبت کنید.
+                                </p>
+                            </div>
+
                         </div>
-                    </form>
-                </div>
+                    </header>
+
+                    <!-- Body -->
+                    <div class="card-body member-card-body">
+                        <form method="post" novalidate id="memberForm">
+                            {% csrf_token %}
+
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger form-alert mb-3">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="row form-grid">
+
+                                <!-- نام -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label field-label">
+                                            {{ form.first_name.label }}
+                                        </label>
+
+                                        {{ form.first_name }}
+
+                                        {% if form.first_name.errors %}
+                                            <div class="field-error">
+                                                {{ form.first_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- نام خانوادگی -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label field-label">
+                                            {{ form.last_name.label }}
+                                        </label>
+
+                                        {{ form.last_name }}
+
+                                        {% if form.last_name.errors %}
+                                            <div class="field-error">
+                                                {{ form.last_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- شماره تماس -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.phone_number.id_for_label }}" class="form-label field-label">
+                                            {{ form.phone_number.label }}
+                                        </label>
+
+                                        {{ form.phone_number }}
+
+                                        <div class="form-text helper-text">
+                                            فرمت معتبر: 09123456789
+                                        </div>
+
+                                        {% if form.phone_number.errors %}
+                                            <div class="field-error">
+                                                {{ form.phone_number.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- شهر -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.city.id_for_label }}" class="form-label field-label">
+                                            {{ form.city.label }}
+                                        </label>
+
+                                        {{ form.city }}
+
+                                        {% if form.city.errors %}
+                                            <div class="field-error">
+                                                {{ form.city.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- انتخاب حوزه از لیست -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.job_category.id_for_label }}" class="form-label field-label">
+                                            {{ form.job_category.label }}
+                                        </label>
+
+                                        {{ form.job_category }}
+
+                                        {% if form.job_category.errors %}
+                                            <div class="field-error">
+                                                {{ form.job_category.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- حوزه جدید -->
+                                <div class="col-12 col-md-6">
+                                    <div class="field-group">
+                                        <label for="{{ form.job_name.id_for_label }}"
+                                               class="form-label field-label text-success">
+                                            {{ form.job_name.label }}
+                                        </label>
+
+                                        {{ form.job_name }}
+
+                                        <div class="form-text helper-text">
+                                            اگر حوزه در لیست نبود، اینجا وارد کنید تا خودکار ساخته شود.
+                                        </div>
+
+                                        {% if form.job_name.errors %}
+                                            <div class="field-error">
+                                                {{ form.job_name.errors }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- راهنمای هوشمند -->
+                            <div id="jobHint" class="job-hint alert alert-light border d-none"></div>
+
+                            <!-- Actions -->
+                            <div class="form-actions">
+                                <a href="{% url 'member_list' %}"
+                                   class="btn btn-outline-secondary btn-form-action order-2 order-sm-1">
+                                    انصراف
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-primary btn-form-action order-1 order-sm-2"
+                                        id="submitBtn">
+                                    ثبت اطلاعات
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </section>
+
             </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Mobile-first tweaks */
+    /*
+    |--------------------------------------------------------------------------
+    | Member Create Page
+    |--------------------------------------------------------------------------
+    */
+
+    .member-create-page {
+        padding-top: .45rem;
+        padding-bottom: 1rem;
+    }
+
     .member-card {
-        border-radius: 14px;
+        overflow: hidden;
+        border-radius: 18px;
+        background: #ffffff;
+        box-shadow: 0 10px 28px rgba(15, 23, 42, .08) !important;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Header
+    |--------------------------------------------------------------------------
+    */
+
+    .member-card-header {
+        padding: .95rem .9rem .35rem;
+    }
+
+    .member-header {
+        display: flex;
+        align-items: flex-start;
+        gap: .65rem;
+    }
+
+    .member-header-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .member-title {
+        font-size: 1rem;
+        font-weight: 900;
+        line-height: 1.45;
+    }
+
+    .member-subtitle {
+        max-width: 46rem;
+        font-size: .72rem;
+        line-height: 1.8;
+    }
+
+    .back-icon-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+
+        background: #f9fafb;
+        color: #374151;
+        text-decoration: none;
+
+        transition:
+            color .18s ease,
+            background-color .18s ease,
+            border-color .18s ease,
+            transform .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .back-icon-btn:hover,
+    .back-icon-btn:focus {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: #2563eb;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(37, 99, 235, .12);
+    }
+
+    .back-icon-btn .material-symbols-outlined {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Body / Form
+    |--------------------------------------------------------------------------
+    */
+
+    .member-card-body {
+        padding: .9rem .9rem 1rem;
+    }
+
+    .form-grid {
+        --bs-gutter-x: .7rem;
+        --bs-gutter-y: .82rem;
+    }
+
+    .field-group {
+        width: 100%;
+    }
+
+    .field-label {
+        display: inline-flex;
+        align-items: center;
+
+        margin-bottom: .35rem;
+
+        color: #1f2937;
+        font-size: .78rem;
+        font-weight: 800;
+        line-height: 1.5;
     }
 
     .form-control,
     .form-select {
-        min-height: 44px; /* لمس راحت روی موبایل */
-        font-size: .95rem;
+        width: 100%;
+        min-height: 40px;
+
+        padding: .48rem .7rem;
+
+        border-color: #d8dee9;
+        border-radius: 12px;
+
+        background-color: #ffffff;
+        color: #111827;
+
+        font-size: .8rem;
+        line-height: 1.5;
+
+        box-shadow: none !important;
+
+        transition:
+            border-color .18s ease,
+            box-shadow .18s ease,
+            background-color .18s ease;
     }
 
-    .btn {
-        min-height: 44px;
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 .18rem rgba(59, 130, 246, .14) !important;
     }
 
-    @media (max-width: 575.98px) {
-        .card-title {
-            font-size: 1.05rem !important;
-        }
+    .form-control::placeholder {
+        color: #9ca3af;
+        font-size: .76rem;
     }
 
-    @media (min-width: 768px) {
-        .member-card {
-            border-radius: 16px;
-        }
+    .helper-text {
+        margin-top: .3rem;
+
+        color: #6b7280;
+        font-size: .65rem;
+        line-height: 1.65;
     }
 
-    /* خطای زیباتر برای فیلدها */
-    .text-danger ul {
+    .field-error {
+        margin-top: .35rem;
+
+        color: #dc2626;
+        font-size: .68rem;
+        line-height: 1.6;
+    }
+
+    .field-error ul,
+    .form-alert ul {
         margin: 0;
         padding-right: 1rem;
+    }
+
+    .form-alert {
+        padding: .65rem .75rem;
+
+        border: 0;
+        border-radius: 12px;
+
+        font-size: .72rem;
+        line-height: 1.7;
+    }
+
+    .job-hint {
+        margin: .95rem 0 0;
+        padding: .65rem .75rem;
+
+        border-radius: 13px;
+
+        font-size: .7rem;
+        line-height: 1.75;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Actions
+    |--------------------------------------------------------------------------
+    */
+
+    .form-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .55rem;
+
+        margin-top: 1rem;
+    }
+
+    .btn-form-action {
+        width: 100%;
+        min-height: 40px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        padding: .5rem .9rem;
+
+        font-size: .8rem;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Very Small Phones
+    |--------------------------------------------------------------------------
+    */
+
+    @media (max-width: 359.98px) {
+        .member-create-page {
+            padding-top: .3rem;
+        }
+
+        .member-card {
+            border-radius: 15px;
+        }
+
+        .member-card-header {
+            padding: .82rem .75rem .25rem;
+        }
+
+        .member-card-body {
+            padding: .78rem .75rem .9rem;
+        }
+
+        .member-header {
+            gap: .5rem;
+        }
+
+        .back-icon-btn {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+        }
+
+        .back-icon-btn .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        .member-title {
+            font-size: .92rem;
+        }
+
+        .member-subtitle {
+            font-size: .66rem;
+            line-height: 1.7;
+        }
+
+        .form-grid {
+            --bs-gutter-x: .55rem;
+            --bs-gutter-y: .7rem;
+        }
+
+        .field-label {
+            font-size: .72rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 38px;
+            padding: .42rem .58rem;
+            border-radius: 10px;
+            font-size: .75rem;
+        }
+
+        .helper-text {
+            font-size: .61rem;
+        }
+
+        .job-hint {
+            padding: .55rem .65rem;
+            font-size: .64rem;
+        }
+
+        .btn-form-action {
+            min-height: 38px;
+            border-radius: 10px;
+            font-size: .74rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Small Devices
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 576px) {
+        .member-create-page {
+            padding-top: .75rem;
+            padding-bottom: 1.25rem;
+        }
+
+        .member-card-header {
+            padding: 1.15rem 1.15rem .45rem;
+        }
+
+        .member-card-body {
+            padding: 1rem 1.15rem 1.15rem;
+        }
+
+        .member-title {
+            font-size: 1.08rem;
+        }
+
+        .member-subtitle {
+            font-size: .78rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 43px;
+            font-size: .86rem;
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: .6rem;
+        }
+
+        .btn-form-action {
+            width: auto;
+            min-width: 118px;
+            min-height: 42px;
+            font-size: .84rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tablet
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 768px) {
+        .member-create-page {
+            padding-top: 1rem;
+            padding-bottom: 1.5rem;
+        }
+
+        .member-card {
+            border-radius: 20px;
+        }
+
+        .member-card-header {
+            padding: 1.35rem 1.35rem .55rem;
+        }
+
+        .member-card-body {
+            padding: 1.15rem 1.35rem 1.35rem;
+        }
+
+        .member-title {
+            font-size: 1.18rem;
+        }
+
+        .member-subtitle {
+            font-size: .82rem;
+        }
+
+        .form-grid {
+            --bs-gutter-x: .9rem;
+            --bs-gutter-y: 1rem;
+        }
+
+        .field-label {
+            font-size: .84rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 45px;
+            padding: .55rem .8rem;
+            border-radius: 13px;
+            font-size: .9rem;
+        }
+
+        .helper-text {
+            font-size: .7rem;
+        }
+
+        .job-hint {
+            padding: .7rem .85rem;
+            font-size: .76rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 992px) {
+        .member-create-page {
+            padding-top: 1.2rem;
+        }
+
+        .member-card-header {
+            padding: 1.5rem 1.5rem .6rem;
+        }
+
+        .member-card-body {
+            padding: 1.25rem 1.5rem 1.5rem;
+        }
+
+        .member-title {
+            font-size: 1.28rem;
+        }
+
+        .member-subtitle {
+            font-size: .86rem;
+        }
+
+        .back-icon-btn {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 46px;
+            font-size: .92rem;
+        }
+
+        .btn-form-action {
+            min-width: 128px;
+            min-height: 44px;
+            font-size: .88rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Autofill
+    |--------------------------------------------------------------------------
+    */
+
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+        -webkit-text-fill-color: #111827;
+        -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+        transition: background-color 9999s ease-in-out 0s;
     }
 </style>
 
 <script>
     (function () {
+        const form = document.getElementById("memberForm");
+        const phoneInput = document.getElementById("id_phone_number");
         const jobCategory = document.getElementById("id_job_category");
         const jobName = document.getElementById("id_job_name");
         const hintBox = document.getElementById("jobHint");
 
-        if (!jobCategory || !jobName || !hintBox) return;
-
-        function updateHint() {
-            const hasCategory = !!jobCategory.value;
-            const hasJobName = !!jobName.value.trim();
-
-            if (hasCategory && hasJobName) {
-                hintBox.className = "alert alert-warning border small mt-3 mb-0 py-2 px-3";
-                hintBox.textContent = "هم حوزه انتخاب شده و هم حوزه جدید وارد شده است. اولویت با «حوزه جدید» خواهد بود.";
-            } else if (hasCategory) {
-                hintBox.className = "alert alert-info border small mt-3 mb-0 py-2 px-3";
-                hintBox.textContent = "حوزه فعالیت از لیست انتخاب شده است.";
-            } else if (hasJobName) {
-                hintBox.className = "alert alert-success border small mt-3 mb-0 py-2 px-3";
-                hintBox.textContent = "حوزه جدید ثبت خواهد شد و برای دفعات بعد در لیست نمایش داده می‌شود.";
-            } else {
-                hintBox.className = "alert alert-light border small mt-3 mb-0 py-2 px-3";
-                hintBox.textContent = "یک حوزه از لیست انتخاب کنید یا حوزه جدید وارد کنید.";
-            }
-            hintBox.classList.remove("d-none");
+        /*
+        |--------------------------------------------------------------------------
+        | Phone Input UX
+        |--------------------------------------------------------------------------
+        */
+        if (phoneInput) {
+            phoneInput.setAttribute("inputmode", "numeric");
+            phoneInput.setAttribute("autocomplete", "tel");
+            phoneInput.setAttribute("dir", "ltr");
+            phoneInput.setAttribute("placeholder", "09123456789");
         }
 
-        jobCategory.addEventListener("change", updateHint);
-        jobName.addEventListener("input", updateHint);
-        updateHint();
+        /*
+        |--------------------------------------------------------------------------
+        | Smart Job Hint
+        |--------------------------------------------------------------------------
+        */
+        if (jobCategory && jobName && hintBox) {
+            function updateHint() {
+                const hasCategory = Boolean(jobCategory.value);
+                const hasJobName = Boolean(jobName.value.trim());
+
+                if (hasCategory && hasJobName) {
+                    hintBox.className = "job-hint alert alert-warning border";
+                    hintBox.textContent = "هم حوزه انتخاب شده و هم حوزه جدید وارد شده است. اولویت با «حوزه جدید» خواهد بود.";
+                } else if (hasCategory) {
+                    hintBox.className = "job-hint alert alert-info border";
+                    hintBox.textContent = "حوزه فعالیت از لیست انتخاب شده است.";
+                } else if (hasJobName) {
+                    hintBox.className = "job-hint alert alert-success border";
+                    hintBox.textContent = "حوزه جدید ثبت خواهد شد و برای دفعات بعد در لیست نمایش داده می‌شود.";
+                } else {
+                    hintBox.className = "job-hint alert alert-light border";
+                    hintBox.textContent = "یک حوزه از لیست انتخاب کنید یا حوزه جدید وارد کنید.";
+                }
+
+                hintBox.classList.remove("d-none");
+            }
+
+            jobCategory.addEventListener("change", updateHint);
+            jobName.addEventListener("input", updateHint);
+
+            updateHint();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent Double Submit
+        |--------------------------------------------------------------------------
+        */
+        if (form) {
+            form.addEventListener("submit", function () {
+                const submitBtn = document.getElementById("submitBtn");
+
+                if (!submitBtn || submitBtn.disabled) return;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = "در حال ثبت...";
+            });
+        }
     })();
 </script>
 {% endblock %}

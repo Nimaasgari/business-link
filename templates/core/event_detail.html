@@ -1,0 +1,1093 @@
+{% extends "core/base.html" %}
+{% load jalali_tags %}
+{% load tz %}
+{% block title %}
+    {{ event.name }} | جزئیات مهمانی
+{% endblock %}
+
+{% block extra_css %}
+    <style>
+        :root {
+            --detail-bg: #f4f6fb;
+            --detail-surface: #ffffff;
+            --detail-surface-soft: #f8fafc;
+            --detail-text: #111827;
+            --detail-text-soft: #6b7280;
+            --detail-border: #e5e7eb;
+            --detail-primary: #2563eb;
+            --detail-primary-soft: rgba(37, 99, 235, .08);
+            --detail-success: #16a34a;
+            --detail-danger: #dc2626;
+            --detail-warning: #f59e0b;
+            --detail-radius-sm: 10px;
+            --detail-radius-md: 14px;
+            --detail-radius-lg: 18px;
+            --detail-radius-xl: 22px;
+            --detail-shadow-soft: 0 8px 22px rgba(15, 23, 42, .06);
+            --detail-shadow-card: 0 12px 30px rgba(15, 23, 42, .08);
+        }
+
+        .event-detail-page {
+            min-height: 100%;
+            padding: .55rem .55rem 1rem;
+            background: var(--detail-bg);
+        }
+
+        .event-detail-shell {
+            width: 100%;
+            max-width: 1180px;
+            margin: 0 auto;
+        }
+
+        /* ── Hero Card ── */
+        .event-hero-card {
+            margin-bottom: .75rem;
+            border: 1px solid rgba(229, 231, 235, .95);
+            border-radius: var(--detail-radius-lg);
+            background: radial-gradient(circle at top right, rgba(37, 99, 235, .08), transparent 30%),
+            var(--detail-surface);
+            box-shadow: var(--detail-shadow-card);
+        }
+
+        .event-hero-body {
+            padding: .9rem;
+        }
+
+        .event-hero-top {
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+        }
+
+        .event-title-wrap {
+            min-width: 0;
+        }
+
+        .event-title-row {
+            display: flex;
+            align-items: flex-start;
+            gap: .6rem;
+            min-width: 0;
+        }
+
+        .back-icon-btn {
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--detail-border);
+            border-radius: 12px;
+            background: #ffffff;
+            color: #374151;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+            transition: color .18s ease, background-color .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+        }
+
+        .back-icon-btn:hover,
+        .back-icon-btn:focus {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: var(--detail-primary);
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, .12);
+        }
+
+        .back-icon-btn .material-symbols-outlined {
+            font-size: 22px;
+            line-height: 1;
+        }
+
+        .event-title {
+            margin: 0;
+            color: var(--detail-text);
+            font-size: 1rem;
+            font-weight: 900;
+            line-height: 1.6;
+            letter-spacing: -.02em;
+            word-break: break-word;
+        }
+
+        .event-meta-list {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+            margin-top: .35rem;
+        }
+
+        .event-meta-item {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            color: var(--detail-text-soft);
+            font-size: .72rem;
+            line-height: 1.8;
+        }
+
+        .event-meta-item .material-symbols-outlined {
+            font-size: 17px;
+            line-height: 1;
+            color: #64748b;
+        }
+
+        .event-status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: fit-content;
+            margin-top: .45rem;
+            padding: .28rem .58rem;
+            border-radius: 999px;
+            font-size: .68rem;
+            font-weight: 850;
+            line-height: 1.5;
+        }
+
+        .event-status-pending {
+            background: rgba(245, 158, 11, .11);
+            color: #92400e;
+        }
+
+        .event-status-active {
+            background: rgba(22, 163, 74, .11);
+            color: #166534;
+        }
+
+        .event-status-completed {
+            background: rgba(100, 116, 139, .13);
+            color: #334155;
+        }
+
+        .event-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: .5rem;
+            width: 100%;
+        }
+
+        .event-action-form {
+            width: 100%;
+        }
+
+        .event-action-btn {
+            width: 100%;
+            min-height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .35rem;
+            border-radius: 11px;
+            padding: .45rem .7rem;
+            font-size: .76rem;
+            font-weight: 850;
+            line-height: 1.5;
+            white-space: nowrap;
+        }
+
+        /* ── Live Panel ── */
+        .event-live-panel {
+            margin-top: .9rem;
+            padding-top: .9rem;
+            border-top: 1px solid var(--detail-border);
+        }
+
+        .timer-card,
+        .checkin-card {
+            height: 100%;
+            padding: .75rem;
+            border: 1px solid var(--detail-border);
+            border-radius: var(--detail-radius-md);
+            background: rgba(248, 250, 252, .88);
+        }
+
+        /* ★ z-index بالا برای checkin-card تا suggest بالای همه بیاید */
+        .checkin-card {
+            position: relative;
+            z-index: 50;
+        }
+
+        .timer-label {
+            margin-bottom: .25rem;
+            color: var(--detail-text-soft);
+            font-size: .7rem;
+            font-weight: 750;
+            line-height: 1.6;
+        }
+
+        .event-timer {
+            direction: ltr;
+            text-align: right;
+            color: #0f172a;
+            font-size: 1.35rem;
+            font-weight: 950;
+            line-height: 1.4;
+            letter-spacing: .02em;
+        }
+
+        .checkin-form {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+        }
+
+        .checkin-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: .5rem;
+        }
+
+        .checkin-input {
+            min-height: 40px;
+            border-radius: 12px;
+            font-size: .8rem;
+        }
+
+        .checkin-input[dir="ltr"] {
+            text-align: left;
+        }
+
+        /* ★ z-index خیلی بالا + shadow قوی‌تر */
+        .guest-suggest {
+            position: absolute;
+            top: calc(100% + .4rem);
+            right: 0;
+            left: 0;
+            z-index: 9999;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid #dbe2ea;
+            background: #ffffff;
+            box-shadow: 0 12px 40px rgba(15, 23, 42, .18);
+        }
+
+        .guest-suggest .list-group-item {
+            padding: .5rem .7rem;
+            font-size: .74rem;
+            line-height: 1.7;
+            cursor: pointer;
+        }
+
+        .guest-suggest .list-group-item:hover,
+        .guest-suggest .list-group-item.active {
+            background: #eff6ff;
+        }
+
+        /* ── Stats ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: .55rem;
+            margin-bottom: .75rem;
+        }
+
+        .stat-card {
+            min-height: 82px;
+            padding: .75rem;
+            border: 1px solid rgba(229, 231, 235, .95);
+            border-radius: var(--detail-radius-md);
+            background: var(--detail-surface);
+            box-shadow: var(--detail-shadow-soft);
+        }
+
+        .stat-label {
+            margin-bottom: .25rem;
+            color: var(--detail-text-soft);
+            font-size: .68rem;
+            font-weight: 750;
+            line-height: 1.6;
+        }
+
+        .stat-value {
+            color: var(--detail-text);
+            font-size: 1.35rem;
+            font-weight: 950;
+            line-height: 1.3;
+        }
+
+        /* ── Guests Section ── */
+        .guests-card {
+            overflow: hidden;
+            border: 1px solid rgba(229, 231, 235, .95);
+            border-radius: var(--detail-radius-lg);
+            background: var(--detail-surface);
+            box-shadow: var(--detail-shadow-card);
+        }
+
+        .guests-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+            padding: .8rem .9rem;
+            border-bottom: 1px solid var(--detail-border);
+            background: #ffffff;
+        }
+
+        .guests-card-title {
+            margin: 0;
+            color: var(--detail-text);
+            font-size: .9rem;
+            font-weight: 900;
+            line-height: 1.6;
+        }
+
+        .guests-card-subtitle {
+            margin: 0;
+            color: var(--detail-text-soft);
+            font-size: .68rem;
+            line-height: 1.7;
+        }
+
+        /* ── Desktop Table ── */
+        .guests-table-wrap {
+            display: none;
+        }
+
+        .guests-table {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+        .guests-table thead th {
+            padding: .75rem .85rem;
+            border-bottom: 1px solid var(--detail-border);
+            color: #475569;
+            font-size: .72rem;
+            font-weight: 850;
+            line-height: 1.6;
+        }
+
+        .guests-table tbody td {
+            padding: .75rem .85rem;
+            color: #111827;
+            font-size: .76rem;
+            line-height: 1.7;
+            vertical-align: middle;
+        }
+
+        .phone-text {
+            direction: ltr;
+            unicode-bidi: plaintext;
+            text-align: left;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            font-size: .75rem;
+        }
+
+        .status-select {
+            min-width: 128px;
+            border-radius: 10px;
+            font-size: .72rem;
+        }
+
+        .table-action-form {
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+        }
+
+        /* ── Mobile Guest Cards ── */
+        .guest-mobile-list {
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            padding: .75rem;
+        }
+
+        .guest-mobile-card {
+            padding: .6rem .75rem;
+            border: 1px solid var(--detail-border);
+            border-radius: var(--detail-radius-md);
+            background: radial-gradient(circle at top left, rgba(37, 99, 235, .04), transparent 35%),
+            #ffffff;
+        }
+
+        .guest-mobile-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .65rem;
+            margin-bottom: .4rem;
+        }
+
+        .guest-name {
+            margin: 0;
+            color: var(--detail-text);
+            font-size: .8rem;
+            font-weight: 900;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .guest-status-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            padding: .22rem .5rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #334155;
+            font-size: .6rem;
+            font-weight: 850;
+            line-height: 1.5;
+            white-space: nowrap;
+        }
+
+        /* ★ ردیف فشرده برای شماره تماس و زمان حضور */
+        .guest-info-row {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            flex-wrap: wrap;
+            margin-bottom: .45rem;
+            padding: .25rem .5rem;
+            border-radius: 8px;
+            background: #f8fafc;
+            font-size: .68rem;
+            color: #475569;
+        }
+
+        .guest-info-sep {
+            color: #cbd5e1;
+            font-size: .6rem;
+        }
+
+        .guest-status-form {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: .45rem;
+        }
+
+        .empty-state {
+            padding: 1.6rem .9rem;
+            color: var(--detail-text-soft);
+            text-align: center;
+            font-size: .78rem;
+            line-height: 1.8;
+        }
+
+        /* ── Bootstrap Controls ── */
+        .form-control,
+        .form-select {
+            box-shadow: none !important;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--detail-primary);
+            box-shadow: 0 0 0 .18rem rgba(37, 99, 235, .14) !important;
+        }
+
+        /* ── Very Small Phones ── */
+        @media (max-width: 359.98px) {
+            .event-detail-page {
+                padding: .45rem .45rem .85rem;
+            }
+
+            .event-hero-body {
+                padding: .75rem;
+            }
+
+            .event-title {
+                font-size: .92rem;
+            }
+
+            .event-meta-item {
+                font-size: .66rem;
+            }
+
+            .event-action-btn {
+                min-height: 36px;
+                font-size: .7rem;
+                border-radius: 10px;
+            }
+
+            .timer-card, .checkin-card {
+                padding: .65rem;
+                border-radius: 12px;
+            }
+
+            .event-timer {
+                font-size: 1.2rem;
+            }
+
+            .stats-grid {
+                gap: .45rem;
+            }
+
+            .stat-card {
+                min-height: 76px;
+                padding: .65rem;
+                border-radius: 12px;
+            }
+
+            .stat-label {
+                font-size: .62rem;
+            }
+
+            .stat-value {
+                font-size: 1.2rem;
+            }
+
+            .guests-card-header {
+                padding: .7rem .75rem;
+            }
+
+            .guest-mobile-list {
+                padding: .6rem;
+                gap: .45rem;
+            }
+
+            .guest-mobile-card {
+                padding: .55rem .65rem;
+                border-radius: 12px;
+            }
+
+            .guest-name {
+                font-size: .75rem;
+            }
+
+            .guest-info-row {
+                font-size: .63rem;
+                padding: .2rem .4rem;
+            }
+
+            .status-select {
+                min-width: 0;
+                font-size: .66rem;
+            }
+        }
+
+        /* ── Small Devices ── */
+        @media (min-width: 576px) {
+            .event-detail-page {
+                padding: .85rem .85rem 1.25rem;
+            }
+
+            .event-title {
+                font-size: 1.12rem;
+            }
+
+            .event-meta-list {
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: .45rem .85rem;
+            }
+
+            .event-actions {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .checkin-row {
+                grid-template-columns: 1fr auto;
+                align-items: center;
+            }
+
+            .checkin-row .btn {
+                min-width: 112px;
+                min-height: 40px;
+                border-radius: 12px;
+            }
+        }
+
+        /* ── Tablet ── */
+        @media (min-width: 768px) {
+            .event-detail-page {
+                padding: 1rem 1rem 1.5rem;
+            }
+
+            .event-hero-card {
+                border-radius: 20px;
+                margin-bottom: .9rem;
+            }
+
+            .event-hero-body {
+                padding: 1.15rem;
+            }
+
+            .event-hero-top {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: flex-start;
+            }
+
+            .event-actions {
+                width: auto;
+                min-width: 320px;
+                grid-template-columns: repeat(2, minmax(0, auto));
+                justify-content: end;
+            }
+
+            .event-action-form {
+                width: auto;
+            }
+
+            .event-action-btn {
+                width: auto;
+                min-width: 104px;
+                min-height: 40px;
+                font-size: .78rem;
+            }
+
+            .event-title {
+                font-size: 1.28rem;
+            }
+
+            .event-meta-item {
+                font-size: .78rem;
+            }
+
+            .event-live-panel {
+                margin-top: 1rem;
+                padding-top: 1rem;
+            }
+
+            .timer-card, .checkin-card {
+                padding: .85rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: .7rem;
+                margin-bottom: .9rem;
+            }
+
+            .stat-card {
+                min-height: 92px;
+                padding: .85rem;
+            }
+
+            .stat-label {
+                font-size: .72rem;
+            }
+
+            .stat-value {
+                font-size: 1.55rem;
+            }
+
+            .guests-card {
+                border-radius: 20px;
+            }
+
+            .guests-card-header {
+                padding: .9rem 1rem;
+            }
+
+            .guests-card-title {
+                font-size: 1rem;
+            }
+
+            .guests-card-subtitle {
+                font-size: .72rem;
+            }
+        }
+
+        /* ── Desktop ── */
+        @media (min-width: 992px) {
+            .event-detail-page {
+                padding-top: 1.25rem;
+            }
+
+            .event-title {
+                font-size: 1.45rem;
+            }
+
+            .event-actions {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                align-items: center;
+                gap: .5rem;
+                min-width: 0;
+            }
+
+            .event-action-btn {
+                min-width: auto;
+                padding-inline: .8rem;
+                font-size: .8rem;
+            }
+
+            .event-timer {
+                font-size: 1.65rem;
+            }
+
+            .guest-mobile-list {
+                display: none;
+            }
+
+            .guests-table-wrap {
+                display: block;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="event-detail-page">
+        <div class="event-detail-shell">
+
+            <!-- Hero / Event Summary -->
+            <section class="event-hero-card">
+                <div class="event-hero-body">
+
+                    <div class="event-hero-top">
+
+                        <div class="event-title-row">
+                            <a href="{% url 'event_list' %}"
+                               class="back-icon-btn"
+                               aria-label="بازگشت به لیست مهمانی‌ها"
+                               title="بازگشت به لیست مهمانی‌ها">
+                                <span class="material-symbols-outlined">arrow_forward</span>
+                            </a>
+
+                            <div class="event-title-wrap">
+                                <h1 class="event-title">{{ event.name }}</h1>
+
+                                <div class="event-meta-list">
+                                    <div class="event-meta-item">
+                                        <span class="material-symbols-outlined">location_on</span>
+                                        <span>{{ event.city }} | {{ event.venue_name }}</span>
+                                    </div>
+                                    <div class="event-meta-item">
+                                        <span class="material-symbols-outlined">event</span>
+                                        <span>{{ event.event_date|to_jalali:'%Y/%m/%d' }}</span>
+                                    </div>
+                                    <div class="event-meta-item">
+                                        <span class="material-symbols-outlined">schedule</span>
+                                        <span dir="ltr">{{ event.event_time|time:'H:i' }}</span>
+                                    </div>
+                                </div>
+
+                                {% if event.status == 'pending' %}
+                                    <span class="event-status-badge event-status-pending">در انتظار شروع</span>
+                                {% elif event.status == 'active' %}
+                                    <span class="event-status-badge event-status-active">در حال برگزاری</span>
+                                {% else %}
+                                    <span class="event-status-badge event-status-completed">{{ event.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="event-actions">
+                            {% if event.status == 'pending' %}
+                                <form method="post" action="{% url 'send_invites' event.pk %}"
+                                      class="event-action-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm event-action-btn">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+                                        دعوت از مهمانان
+                                    </button>
+                                </form>
+                                <form method="post" action="{% url 'start_event' event.pk %}" class="event-action-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm event-action-btn">
+                                        <span class="material-symbols-outlined"
+                                              style="font-size: 18px;">play_arrow</span>
+                                        شروع مهمانی
+                                    </button>
+                                </form>
+                            {% elif event.status == 'active' %}
+                                <form method="post" action="{% url 'complete_event' event.pk %}"
+                                      class="event-action-form">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm event-action-btn">
+                                        <span class="material-symbols-outlined"
+                                              style="font-size: 18px;">stop_circle</span>
+                                        اتمام مهمانی
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            <a href="{% url 'edit_event' event.pk %}"
+                               class="btn btn-outline-primary btn-sm event-action-btn">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                                ویرایش
+                            </a>
+                        </div>
+
+                    </div>
+
+                    {% if event.status == 'active' %}
+                        <div class="event-live-panel">
+                            <div class="row g-3 align-items-stretch">
+                                <div class="col-12 col-md-4">
+                                    <div class="timer-card">
+                                        <div class="timer-label">مدت زمان برگزاری</div>
+                                        <div id="event-timer" class="event-timer" data-seconds="{{ elapsed_seconds }}">
+                                            00:00:00
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-12 col-md-8">
+                                    <div class="checkin-card">
+                                        <form method="post" action="{% url 'event_checkin' event.pk %}"
+                                              class="checkin-form">
+                                            {% csrf_token %}
+                                            <div class="checkin-row">
+                                                <input id="guest-query"
+                                                       type="text"
+                                                       name="guest_query"
+                                                       class="form-control checkin-input"
+                                                       placeholder="نام یا شماره تماس مهمان"
+                                                       autocomplete="off"
+                                                       inputmode="search"
+                                                       required>
+                                                <button type="submit" class="btn btn-success event-action-btn">
+                                                    ثبت حضور
+                                                </button>
+                                            </div>
+                                            <div id="guest-suggest" class="list-group guest-suggest d-none"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </section>
+
+            <!-- Stats -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">کل مهمان‌ها</div>
+                    <div class="stat-value">{{ event.guest_count }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">دعوت شد</div>
+                    <div class="stat-value">{{ event.invited_count }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">حاضر</div>
+                    <div class="stat-value">{{ event.present_count }}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">غایب</div>
+                    <div class="stat-value">{{ event.absent_count }}</div>
+                </div>
+            </section>
+
+            <!-- Guests -->
+            <section class="guests-card">
+                <div class="guests-card-header">
+                    <h2 class="guests-card-title">لیست مهمان‌ها</h2>
+                    <p class="guests-card-subtitle">وضعیت دعوت و حضور هر مهمان را از این بخش مدیریت کنید.</p>
+                </div>
+
+                <!-- Mobile Cards -->
+                <div class="guest-mobile-list">
+                    {% for guest in guests %}
+                        <article class="guest-mobile-card">
+                            <div class="guest-mobile-head">
+                                <h3 class="guest-name">{{ guest.member.full_name }}</h3>
+                                <span class="guest-status-pill">{{ guest.get_status_display }}</span>
+                            </div>
+
+                            <div class="guest-info-row">
+                                <span class="phone-text">{{ guest.member.phone_number }}</span>
+                                <span class="guest-info-sep">•</span>
+                                <span>
+                                {% if guest.check_in_time %}
+                                   
+                                    {{ guest.check_in_time|localtime|to_jalali:'%Y/%m/%d' }} -
+                                    {{ guest.check_in_time|localtime|time:'H:i' }}
+
+                                {% else %}
+                                    ثبت نشده
+                                {% endif %}
+                            </span>
+                            </div>
+
+                            <form method="post"
+                                  action="{% url 'update_guest_status' guest.pk %}"
+                                  class="guest-status-form">
+                                {% csrf_token %}
+                                <select name="status" class="form-select form-select-sm status-select">
+                                    <option value="draft" {% if guest.status == "draft" %}selected{% endif %}>پیش‌نویس
+                                    </option>
+                                    <option value="invited" {% if guest.status == "invited" %}selected{% endif %}>دعوت
+                                        شد
+                                    </option>
+                                    <option value="attended" {% if guest.status == "attended" %}selected{% endif %}>حضور
+                                        داشت
+                                    </option>
+                                    <option value="absent" {% if guest.status == "absent" %}selected{% endif %}>غایب
+                                        بود
+                                    </option>
+                                </select>
+                                <button type="submit" class="btn btn-sm btn-primary">ذخیره</button>
+                            </form>
+                        </article>
+                    {% empty %}
+                        <div class="empty-state">برای این مهمانی هنوز مهمانی ثبت نشده است.</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Desktop Table -->
+                <div class="table-responsive guests-table-wrap">
+                    <table class="table align-middle guests-table">
+                        <thead>
+                        <tr>
+                            <th>نام</th>
+                            <th>شماره تماس</th>
+                            <th>وضعیت</th>
+                            <th>زمان حضور</th>
+                            <th>اقدام</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for guest in guests %}
+                            <tr>
+                                <td>{{ guest.member.full_name }}</td>
+                                <td><span class="phone-text">{{ guest.member.phone_number }}</span></td>
+                                <td>{{ guest.get_status_display }}</td>
+                                <td>
+                                    {% if guest.check_in_time %}
+                                        {{ guest.check_in_time|to_jalali:'%Y/%m/%d - H:i' }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <form method="post"
+                                          action="{% url 'update_guest_status' guest.pk %}"
+                                          class="table-action-form">
+                                        {% csrf_token %}
+                                        <select name="status" class="form-select form-select-sm status-select">
+                                            <option value="draft" {% if guest.status == "draft" %}selected{% endif %}>
+                                                پیش‌نویس
+                                            </option>
+                                            <option value="invited"
+                                                    {% if guest.status == "invited" %}selected{% endif %}>دعوت شد
+                                            </option>
+                                            <option value="attended"
+                                                    {% if guest.status == "attended" %}selected{% endif %}>حضور داشت
+                                            </option>
+                                            <option value="absent" {% if guest.status == "absent" %}selected{% endif %}>
+                                                غایب بود
+                                            </option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-primary">ذخیره</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="5" class="empty-state">برای این مهمانی هنوز مهمانی ثبت نشده است.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    {% if event.status == 'active' %}
+        <script>
+            (function () {
+                /* ── Event Timer ── */
+                const timerElement = document.getElementById('event-timer');
+                if (timerElement) {
+                    let seconds = Number(timerElement.dataset.seconds || 0);
+                    const renderTimer = () => {
+                        const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+                        const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+                        const s = String(seconds % 60).padStart(2, '0');
+                        timerElement.textContent = `${h}:${m}:${s}`;
+                    };
+                    renderTimer();
+                    setInterval(() => {
+                        seconds += 1;
+                        renderTimer();
+                    }, 1000);
+                }
+
+                /* ── Guest Lookup / Suggestion ── */
+                const input = document.getElementById('guest-query');
+                const suggest = document.getElementById('guest-suggest');
+
+                if (!input || !suggest) return;
+
+                const hideSuggest = () => {
+                    suggest.classList.add('d-none');
+                    suggest.innerHTML = '';
+                };
+
+                let abortController = null;
+
+                input.addEventListener('input', async () => {
+                    const q = input.value.trim();
+                    if (q.length < 2) {
+                        hideSuggest();
+                        return;
+                    }
+
+                    if (abortController) abortController.abort();
+                    abortController = new AbortController();
+
+                    try {
+                        const response = await fetch(
+                            `{% url 'guest_lookup' event.pk %}?q=${encodeURIComponent(q)}`,
+                            {headers: {'X-Requested-With': 'XMLHttpRequest'}, signal: abortController.signal}
+                        );
+
+                        if (!response.ok) {
+                            hideSuggest();
+                            return;
+                        }
+
+                        const data = await response.json();
+                        const items = data.results || [];
+
+                        if (!items.length) {
+                            hideSuggest();
+                            return;
+                        }
+
+                        suggest.innerHTML = items.map((item) => {
+                            const fullName = item.full_name || 'نامشخص';
+                            const phoneNumber = item.phone_number || '';
+                            const status = item.is_present ? '<span class="badge bg-success ms-1">حاضر</span>' : '';
+
+                            return `
+                        <button type="button"
+                                class="list-group-item list-group-item-action"
+                                data-phone="${phoneNumber}">
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <span><strong>${fullName}</strong> ${status}</span>
+                                <span class="text-muted small" dir="ltr">${phoneNumber}</span>
+                            </div>
+                        </button>
+                    `;
+                        }).join('');
+
+                        suggest.classList.remove('d-none');
+                    } catch (error) {
+                        if (error.name !== 'AbortError') hideSuggest();
+                    }
+                });
+
+                suggest.addEventListener('click', (event) => {
+                    const button = event.target.closest('button[data-phone]');
+                    if (!button) return;
+                    input.value = button.dataset.phone || '';
+                    hideSuggest();
+                });
+
+                document.addEventListener('click', (event) => {
+                    if (!suggest.contains(event.target) && event.target !== input) {
+                        hideSuggest();
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
+{% endblock %}

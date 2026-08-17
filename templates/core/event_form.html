@@ -1,67 +1,1105 @@
-{% extends 'core/base.html' %}
+{% extends "core/base.html" %}
+{% load jalali %}
+{% load tz %}
 
-{% block title %}ایجاد مهمانی جدید{% endblock %}
+{% block title %}
+    {% if object %}ویرایش مهمانی{% else %}ایجاد مهمانی{% endif %} | بیزنس لینک
+{% endblock %}
+
+{% block extra_css %}
+{{ form.media }}
+
+<style>
+    /*
+    |--------------------------------------------------------------------------
+    | Event Form Page - Variables
+    |--------------------------------------------------------------------------
+    */
+
+    :root {
+        --event-bg: #f4f6fb;
+        --event-surface: #ffffff;
+        --event-surface-soft: #f8fafc;
+
+        --event-text: #111827;
+        --event-text-soft: #6b7280;
+
+        --event-border: #e5e7eb;
+
+        --event-primary: #2563eb;
+        --event-primary-soft: rgba(37, 99, 235, .08);
+
+        --event-success: #16a34a;
+        --event-danger: #dc2626;
+
+        --event-radius-sm: 10px;
+        --event-radius-md: 14px;
+        --event-radius-lg: 18px;
+        --event-radius-xl: 22px;
+
+        --event-shadow-soft: 0 8px 22px rgba(15, 23, 42, .06);
+        --event-shadow-card: 0 12px 30px rgba(15, 23, 42, .08);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Page Layout
+    |--------------------------------------------------------------------------
+    */
+
+    .event-form-page {
+        min-height: 100%;
+        padding: .55rem .55rem 1rem;
+        background: var(--event-bg);
+    }
+
+    .event-form-shell {
+        width: 100%;
+        max-width: 980px;
+        margin: 0 auto;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Header
+    |--------------------------------------------------------------------------
+    */
+
+    .event-page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+
+        margin-bottom: .75rem;
+    }
+
+    .event-header-main {
+        display: flex;
+        align-items: flex-start;
+        gap: .65rem;
+        min-width: 0;
+    }
+
+    .back-icon-btn {
+        width: 38px;
+        height: 38px;
+        min-width: 38px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border: 1px solid var(--event-border);
+        border-radius: 12px;
+
+        background: #ffffff;
+        color: #374151;
+        text-decoration: none;
+
+        box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+
+        transition:
+            color .18s ease,
+            background-color .18s ease,
+            border-color .18s ease,
+            transform .18s ease,
+            box-shadow .18s ease;
+    }
+
+    .back-icon-btn:hover,
+    .back-icon-btn:focus {
+        background: #eff6ff;
+        border-color: #bfdbfe;
+        color: var(--event-primary);
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 18px rgba(37, 99, 235, .12);
+    }
+
+    .back-icon-btn .material-symbols-outlined {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .event-page-title {
+        margin: 0;
+
+        color: var(--event-text);
+        font-size: 1rem;
+        font-weight: 900;
+        line-height: 1.55;
+        letter-spacing: -.02em;
+    }
+
+    .event-page-subtitle {
+        margin: .15rem 0 0;
+
+        color: var(--event-text-soft);
+        font-size: .72rem;
+        line-height: 1.8;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Card
+    |--------------------------------------------------------------------------
+    */
+
+    .event-form-card {
+        overflow: hidden;
+
+        border: 1px solid rgba(229, 231, 235, .95);
+        border-radius: var(--event-radius-lg);
+
+        background: var(--event-surface);
+        box-shadow: var(--event-shadow-card);
+    }
+
+    .event-form-card-body {
+        padding: .9rem;
+    }
+
+    .event-form-card-footer {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .55rem;
+
+        padding: .85rem .9rem;
+
+        border-top: 1px solid var(--event-border);
+        background: #ffffff;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Form Fields
+    |--------------------------------------------------------------------------
+    */
+
+    .event-form-grid {
+        --bs-gutter-x: .7rem;
+        --bs-gutter-y: .85rem;
+    }
+
+    .field-group {
+        width: 100%;
+    }
+
+    .field-label {
+        display: inline-flex;
+        align-items: center;
+
+        margin-bottom: .35rem;
+
+        color: #1f2937;
+        font-size: .78rem;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        min-height: 40px;
+
+        padding: .48rem .7rem;
+
+        border-color: #d8dee9;
+        border-radius: 12px;
+
+        background-color: #ffffff;
+        color: #111827;
+
+        font-size: .8rem;
+        line-height: 1.5;
+
+        box-shadow: none !important;
+
+        transition:
+            border-color .18s ease,
+            box-shadow .18s ease,
+            background-color .18s ease;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: var(--event-primary);
+        box-shadow: 0 0 0 .18rem rgba(37, 99, 235, .14) !important;
+    }
+
+    .form-control::placeholder {
+        color: #9ca3af;
+        font-size: .76rem;
+    }
+
+    .form-text {
+        margin-top: .32rem;
+        color: var(--event-text-soft);
+        font-size: .66rem;
+        line-height: 1.65;
+    }
+
+    .errorlist {
+        margin: .35rem 0 0;
+        padding-right: 1rem;
+
+        color: var(--event-danger);
+        font-size: .68rem;
+        line-height: 1.7;
+    }
+
+    .form-alert {
+        padding: .7rem .8rem;
+        border: 0;
+        border-radius: 12px;
+        font-size: .74rem;
+        line-height: 1.8;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Member Picker
+    |--------------------------------------------------------------------------
+    */
+
+    .member-picker {
+        margin-top: .45rem;
+        padding: .7rem;
+
+        border: 1px solid #dbe2ea;
+        border-radius: var(--event-radius-md);
+
+        background:
+            radial-gradient(circle at top left, rgba(37, 99, 235, .06), transparent 32%),
+            #f8fbff;
+    }
+
+    .member-picker-toolbar {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .5rem;
+
+        margin-bottom: .75rem;
+    }
+
+    .member-picker-toolbar .form-control {
+        min-height: 40px;
+    }
+
+    .member-picker-action {
+        min-height: 38px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 11px;
+
+        padding: .45rem .65rem;
+
+        font-size: .74rem;
+        font-weight: 800;
+        line-height: 1.5;
+    }
+
+    .selected-counter {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+
+        margin-bottom: .65rem;
+        padding: .42rem .62rem;
+
+        width: fit-content;
+
+        border-radius: 999px;
+
+        background: #ffffff;
+        color: #0f172a;
+
+        border: 1px solid rgba(219, 226, 234, .95);
+
+        font-size: .72rem;
+        font-weight: 800;
+        line-height: 1.4;
+    }
+
+    .selected-counter span {
+        color: var(--event-primary);
+        font-weight: 900;
+    }
+
+    .member-groups-scroll {
+        max-height: 380px;
+        overflow: auto;
+        padding-left: .15rem;
+        padding-right: .05rem;
+        scrollbar-width: thin;
+    }
+
+    .member-group {
+        margin-bottom: .55rem;
+        padding: .62rem;
+
+        border: 1px solid #e4e9ef;
+        border-radius: .75rem;
+
+        background: #ffffff;
+    }
+
+    .member-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .member-group-title {
+        margin: 0 0 .5rem;
+
+        color: #1f2a44;
+        font-size: .78rem;
+        font-weight: 900;
+        line-height: 1.6;
+    }
+
+    .member-item {
+        display: flex;
+        align-items: flex-start;
+        gap: .5rem;
+
+        padding: .42rem 0;
+
+        border-bottom: 1px dashed #edf2f7;
+
+        cursor: pointer;
+    }
+
+    .member-item:last-child {
+        border-bottom: 0;
+    }
+
+    .member-item .form-check-input {
+        margin-top: .18rem;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .member-item-content {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .member-title-text {
+        display: block;
+
+        color: #111827;
+        font-size: .76rem;
+        font-weight: 750;
+        line-height: 1.65;
+
+        word-break: break-word;
+    }
+
+    .member-meta {
+        display: block;
+
+        margin-top: .05rem;
+
+        color: #64748b;
+        font-size: .66rem;
+        line-height: 1.6;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Footer Buttons
+    |--------------------------------------------------------------------------
+    */
+
+    .event-form-btn {
+        width: 100%;
+        min-height: 40px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .35rem;
+
+        border-radius: 12px;
+
+        padding: .5rem .9rem;
+
+        font-size: .8rem;
+        font-weight: 850;
+        line-height: 1.5;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Very Small Phones
+    |--------------------------------------------------------------------------
+    */
+
+    @media (max-width: 359.98px) {
+        .event-form-page {
+            padding: .45rem .45rem .85rem;
+        }
+
+        .event-page-header {
+            margin-bottom: .6rem;
+        }
+
+        .event-header-main {
+            gap: .5rem;
+        }
+
+        .back-icon-btn {
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            border-radius: 10px;
+        }
+
+        .back-icon-btn .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        .event-page-title {
+            font-size: .92rem;
+        }
+
+        .event-page-subtitle {
+            font-size: .66rem;
+            line-height: 1.7;
+        }
+
+        .event-form-card {
+            border-radius: 15px;
+        }
+
+        .event-form-card-body {
+            padding: .75rem;
+        }
+
+        .event-form-card-footer {
+            padding: .75rem;
+        }
+
+        .event-form-grid {
+            --bs-gutter-x: .55rem;
+            --bs-gutter-y: .7rem;
+        }
+
+        .field-label {
+            font-size: .72rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 38px;
+            padding: .42rem .58rem;
+            border-radius: 10px;
+            font-size: .75rem;
+        }
+
+        .form-text {
+            font-size: .61rem;
+        }
+
+        .member-picker {
+            padding: .55rem;
+            border-radius: 12px;
+        }
+
+        .member-picker-action {
+            min-height: 36px;
+            font-size: .68rem;
+            border-radius: 10px;
+        }
+
+        .selected-counter {
+            font-size: .66rem;
+        }
+
+        .member-groups-scroll {
+            max-height: 330px;
+        }
+
+        .member-group {
+            padding: .52rem;
+            border-radius: 11px;
+        }
+
+        .member-group-title {
+            font-size: .72rem;
+        }
+
+        .member-title-text {
+            font-size: .7rem;
+        }
+
+        .member-meta {
+            font-size: .61rem;
+        }
+
+        .event-form-btn {
+            min-height: 38px;
+            border-radius: 10px;
+            font-size: .74rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Small Devices
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 576px) {
+        .event-form-page {
+            padding: .85rem .85rem 1.25rem;
+        }
+
+        .event-page-title {
+            font-size: 1.12rem;
+        }
+
+        .event-page-subtitle {
+            font-size: .78rem;
+        }
+
+        .event-form-card-body {
+            padding: 1.05rem;
+        }
+
+        .event-form-card-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: .6rem;
+            padding: .95rem 1.05rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 43px;
+            font-size: .86rem;
+        }
+
+        .member-picker-toolbar {
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+        }
+
+        .member-picker-action {
+            min-height: 40px;
+            white-space: nowrap;
+            font-size: .78rem;
+        }
+
+        .event-form-btn {
+            width: auto;
+            min-width: 112px;
+            min-height: 42px;
+            font-size: .84rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tablet
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 768px) {
+        .event-form-page {
+            padding: 1rem 1rem 1.5rem;
+        }
+
+        .event-page-header {
+            margin-bottom: .9rem;
+        }
+
+        .back-icon-btn {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+        }
+
+        .event-page-title {
+            font-size: 1.26rem;
+        }
+
+        .event-page-subtitle {
+            font-size: .84rem;
+        }
+
+        .event-form-card {
+            border-radius: 20px;
+        }
+
+        .event-form-card-body {
+            padding: 1.2rem;
+        }
+
+        .event-form-card-footer {
+            padding: 1rem 1.2rem;
+        }
+
+        .event-form-grid {
+            --bs-gutter-x: .9rem;
+            --bs-gutter-y: 1rem;
+        }
+
+        .field-label {
+            font-size: .84rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 45px;
+            padding: .55rem .8rem;
+            border-radius: 13px;
+            font-size: .9rem;
+        }
+
+        .form-text {
+            font-size: .7rem;
+        }
+
+        .member-picker {
+            padding: .85rem;
+            border-radius: 16px;
+        }
+
+        .selected-counter {
+            font-size: .78rem;
+        }
+
+        .member-groups-scroll {
+            max-height: 430px;
+        }
+
+        .member-group {
+            padding: .7rem;
+        }
+
+        .member-group-title {
+            font-size: .84rem;
+        }
+
+        .member-title-text {
+            font-size: .8rem;
+        }
+
+        .member-meta {
+            font-size: .7rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 992px) {
+        .event-form-page {
+            padding-top: 1.25rem;
+        }
+
+        .event-page-title {
+            font-size: 1.42rem;
+        }
+
+        .event-page-subtitle {
+            font-size: .88rem;
+        }
+
+        .event-form-card-body {
+            padding: 1.35rem;
+        }
+
+        .event-form-card-footer {
+            padding: 1.1rem 1.35rem;
+        }
+
+        .form-control,
+        .form-select {
+            min-height: 46px;
+            font-size: .92rem;
+        }
+
+        .member-groups-scroll {
+            max-height: 460px;
+        }
+
+        .event-form-btn {
+            min-width: 124px;
+            min-height: 44px;
+            font-size: .88rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hidden Native Select Safety
+    |--------------------------------------------------------------------------
+    */
+
+    #id_invited_members_native {
+        display: none !important;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">ایجاد مهمانی جدید</h5>
+<div class="event-form-page">
+    <div class="event-form-shell">
+
+        <!-- Header -->
+        <div class="event-page-header">
+            <div class="event-header-main">
+
+                <a href="{% url 'event_list' %}"
+                   class="back-icon-btn"
+                   aria-label="بازگشت به لیست مهمانی‌ها"
+                   title="بازگشت به لیست مهمانی‌ها">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+
+                <div>
+                    <h1 class="event-page-title">
+                        {% if object %}ویرایش مهمانی{% else %}ایجاد مهمانی{% endif %}
+                    </h1>
+
+                    <p class="event-page-subtitle">
+                        اطلاعات رویداد و لیست مهمان‌ها را مدیریت کنید.
+                    </p>
                 </div>
-                <div class="card-body">
 
-                    <form
-                        method="post"
-                        action="{% url 'add_event' %}"
-                        hx-post="{% url 'add_event' %}"
-                        hx-target="#form-result"
-                        hx-swap="innerHTML">
+            </div>
+        </div>
 
-                        {% csrf_token %}
+        <!-- Form -->
+        <form method="post" class="event-form-card" id="eventForm">
+            {% csrf_token %}
 
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
-                                <label class="form-label">{{ form.name.label }}</label>
-                                {{ form.name }}
+            <div class="event-form-card-body">
+
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger form-alert mb-3">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <div class="row event-form-grid">
+
+                    <!-- نام مهمانی -->
+                    <div class="col-12 col-md-6">
+                        <div class="field-group">
+                            <label for="{{ form.name.id_for_label }}" class="form-label field-label">
+                                {{ form.name.label }}
+                            </label>
+
+                            {{ form.name }}
+                            {{ form.name.errors }}
+                        </div>
+                    </div>
+
+                    <!-- شهر -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="field-group">
+                            <label for="{{ form.city.id_for_label }}" class="form-label field-label">
+                                {{ form.city.label }}
+                            </label>
+
+                            {{ form.city }}
+                            {{ form.city.errors }}
+                        </div>
+                    </div>
+
+                    <!-- مکان برگزاری -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="field-group">
+                            <label for="{{ form.venue_name.id_for_label }}" class="form-label field-label">
+                                {{ form.venue_name.label }}
+                            </label>
+
+                            {{ form.venue_name }}
+                            {{ form.venue_name.errors }}
+                        </div>
+                    </div>
+
+                    <!-- تاریخ -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="field-group">
+                            <label for="{{ form.event_date.id_for_label }}" class="form-label field-label">
+                                {{ form.event_date.label }}
+                            </label>
+
+                            {{ form.event_date }}
+                            {{ form.event_date.errors }}
+                        </div>
+                    </div>
+
+                    <!-- ساعت -->
+                    <div class="col-12 col-sm-6 col-md-3">
+                        <div class="field-group">
+                            <label for="{{ form.event_time.id_for_label }}" class="form-label field-label">
+                                {{ form.event_time.label }}
+                            </label>
+
+                            {{ form.event_time }}
+                            {{ form.event_time.errors }}
+
+                            <datalist id="event-time-suggestions">
+                                <option value="08:00"></option>
+                                <option value="10:00"></option>
+                                <option value="16:00"></option>
+                                <option value="18:00"></option>
+                                <option value="20:00"></option>
+                            </datalist>
+
+                            <div class="form-text">
+                                ساعت را با فرمت 24 ساعته ثبت کنید.
                             </div>
                         </div>
+                    </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.city.label }}</label>
-                                {{ form.city }}
+                    <!-- مهمان‌ها -->
+                    <div class="col-12">
+                        <div class="field-group">
+                            <label class="form-label field-label">
+                                {{ form.invited_members.label }}
+                            </label>
+
+                            {{ form.invited_members }}
+
+                            <div class="member-picker">
+
+                                <div class="member-picker-toolbar">
+                                    <input type="search"
+                                           id="member-search"
+                                           class="form-control"
+                                           placeholder="جستجو با نام یا شماره تماس...">
+
+                                    <button type="button"
+                                            class="btn btn-outline-primary member-picker-action"
+                                            id="select-visible-members">
+                                        انتخاب موارد دیده‌شده
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-outline-secondary member-picker-action"
+                                            id="clear-all-members">
+                                        پاک کردن همه
+                                    </button>
+                                </div>
+
+                                <div class="selected-counter">
+                                    تعداد انتخاب‌شده:
+                                    <span id="selected-members-count">0</span>
+                                </div>
+
+                                <div class="member-groups-scroll">
+                                    {% for group_name, group_members in form.fields.invited_members.choices %}
+                                        <div class="member-group" data-member-group>
+                                            <h6 class="member-group-title">
+                                                {{ group_name }}
+                                            </h6>
+
+                                            {% for member_id, member_title in group_members %}
+                                                <label class="member-item"
+                                                       data-member-item
+                                                       data-search-text="{{ member_title|lower }} {{ group_name|lower }}">
+
+                                                    <input type="checkbox"
+                                                           class="form-check-input member-checkbox"
+                                                           value="{{ member_id }}">
+
+                                                    <span class="member-item-content">
+                                                        <span class="member-title-text">
+                                                            {{ member_title }}
+                                                        </span>
+
+                                                        <small class="member-meta">
+                                                            حوزه: {{ group_name }}
+                                                        </small>
+                                                    </span>
+
+                                                </label>
+                                            {% endfor %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.venue_name.label }}</label>
-                                {{ form.venue_name }}
+
+                            {{ form.invited_members.errors }}
+
+                            <div class="form-text">
+                                اعضا فقط از لیست افراد ثبت‌شده انتخاب می‌شوند و بر اساس حوزه شغلی دسته‌بندی شده‌اند.
                             </div>
                         </div>
-
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.event_date.label }}</label>
-                                {{ form.event_date }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">{{ form.event_time.label }}</label>
-                                {{ form.event_time }}
-                            </div>
-                        </div>
-
-                        <div class="d-grid mt-3">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                ثبت مهمانی
-                            </button>
-                        </div>
-                    </form>
-
-                    <div id="form-result" class="mt-3"></div>
+                    </div>
 
                 </div>
             </div>
-        </div>
+
+            <div class="event-form-card-footer">
+                <a href="{% url 'event_list' %}"
+                   class="btn btn-outline-secondary event-form-btn order-2 order-sm-1">
+                    بازگشت
+                </a>
+
+                <button type="submit"
+                        class="btn btn-primary event-form-btn order-1 order-sm-2"
+                        id="submitBtn">
+                    ذخیره
+                </button>
+            </div>
+        </form>
+
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        const form = document.getElementById('eventForm');
+
+        const nativeSelect = document.getElementById('id_invited_members_native');
+        const checkboxes = Array.from(document.querySelectorAll('.member-checkbox'));
+        const searchInput = document.getElementById('member-search');
+        const selectVisibleBtn = document.getElementById('select-visible-members');
+        const clearAllBtn = document.getElementById('clear-all-members');
+        const selectedCounter = document.getElementById('selected-members-count');
+
+        const eventTimeInput = document.getElementById('id_event_time');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Event Time UX
+        |--------------------------------------------------------------------------
+        */
+        if (eventTimeInput) {
+            eventTimeInput.setAttribute('list', 'event-time-suggestions');
+            eventTimeInput.setAttribute('inputmode', 'numeric');
+            eventTimeInput.setAttribute('placeholder', '18:00');
+            eventTimeInput.setAttribute('dir', 'ltr');
+            eventTimeInput.setAttribute('autocomplete', 'off');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Member Picker
+        |--------------------------------------------------------------------------
+        */
+        if (nativeSelect && checkboxes.length) {
+            const updateCounter = () => {
+                if (selectedCounter) {
+                    selectedCounter.textContent = String(
+                        checkboxes.filter(checkbox => checkbox.checked).length
+                    );
+                }
+            };
+
+            const syncFromNative = () => {
+                const selectedValues = new Set(
+                    Array.from(nativeSelect.options)
+                        .filter(option => option.selected)
+                        .map(option => option.value)
+                );
+
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = selectedValues.has(checkbox.value);
+                });
+
+                updateCounter();
+            };
+
+            const syncToNative = () => {
+                const selectedValues = new Set(
+                    checkboxes
+                        .filter(checkbox => checkbox.checked)
+                        .map(checkbox => checkbox.value)
+                );
+
+                Array.from(nativeSelect.options).forEach((option) => {
+                    option.selected = selectedValues.has(option.value);
+                });
+
+                updateCounter();
+            };
+
+            const applySearch = () => {
+                const query = (searchInput?.value || '').trim().toLowerCase();
+                const groups = Array.from(document.querySelectorAll('[data-member-group]'));
+
+                groups.forEach((group) => {
+                    const items = Array.from(group.querySelectorAll('[data-member-item]'));
+                    let visibleCount = 0;
+
+                    items.forEach((item) => {
+                        const text = item.getAttribute('data-search-text') || '';
+                        const visible = !query || text.includes(query);
+
+                        item.style.display = visible ? '' : 'none';
+
+                        if (visible) {
+                            visibleCount += 1;
+                        }
+                    });
+
+                    group.style.display = visibleCount ? '' : 'none';
+                });
+            };
+
+            checkboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', syncToNative);
+            });
+
+            searchInput?.addEventListener('input', applySearch);
+
+            selectVisibleBtn?.addEventListener('click', () => {
+                checkboxes.forEach((checkbox) => {
+                    const item = checkbox.closest('[data-member-item]');
+
+                    if (item && item.style.display !== 'none') {
+                        checkbox.checked = true;
+                    }
+                });
+
+                syncToNative();
+            });
+
+            clearAllBtn?.addEventListener('click', () => {
+                checkboxes.forEach((checkbox) => {
+                    checkbox.checked = false;
+                });
+
+                syncToNative();
+            });
+
+            syncFromNative();
+            applySearch();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent Double Submit
+        |--------------------------------------------------------------------------
+        */
+        if (form) {
+            form.addEventListener('submit', function () {
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (!submitBtn || submitBtn.disabled) return;
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'در حال ذخیره...';
+            });
+        }
+    })();
+</script>
 {% endblock %}

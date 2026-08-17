@@ -1,5 +1,7 @@
 {% extends 'core/base.html' %}
 {% load jalali %}
+{% load jalali tz %}
+
 {% block title %}جزئیات عضو | بیزنس لینک{% endblock %}
 
 {% block content %}
@@ -16,11 +18,12 @@
                         <div class="col-12 col-md-6"><strong>نام خانوادگی:</strong> {{ member.last_name }}</div>
                         <div class="col-12 col-md-6"><strong>شماره تماس:</strong> {{ member.phone_number }}</div>
                         <div class="col-12 col-md-6"><strong>حوزه فعالیت:</strong> {{ member.job_category|default:"-" }}</div>
-                        <div class="col-12"><strong>تاریخ ثبت:</strong> {{ member.created_at|to_jalali:"%Y/%m/%d - %H:%M" }}</div>
+                        <div class="col-12 col-md-6"><strong>شهر:</strong>{{ member.city }}</div>
+                        <div class="col-12"><strong>تاریخ ثبت:</strong> {{ member.created_at|localtime|to_jalali:"%Y/%m/%d - %H:%M" }}</div>
                     </div>
 
                     <div class="d-flex gap-2 mt-4">
-                        <a href="{% url 'member_edit' member.pk %}" class="btn btn-warning">ویرایش</a>
+                        <a href="{% url 'edit_member' member.pk %}" class="btn btn-warning">ویرایش</a>
                         <a href="{% url 'member_list' %}" class="btn btn-outline-secondary">بازگشت به لیست</a>
                     </div>
                 </div>

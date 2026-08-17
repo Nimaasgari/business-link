@@ -1,140 +1,998 @@
 {% extends 'core/base.html' %}
+{% load jalali_tags %}
 
 {% block title %}داشبورد مدیریت | بیزنس لینک{% endblock %}
 
+{% block extra_css %}
+<style>
+    /*
+    |--------------------------------------------------------------------------
+    | Dashboard Variables
+    |--------------------------------------------------------------------------
+    */
+
+    :root {
+        --dash-bg: #f4f6fb;
+        --dash-surface: #ffffff;
+        --dash-surface-soft: #f8fafc;
+
+        --dash-text: #111827;
+        --dash-text-muted: #6b7280;
+
+        --dash-border: #e5e7eb;
+
+        --dash-primary: #1976d2;
+        --dash-primary-dark: #1565c0;
+
+        --dash-success: #2e7d32;
+        --dash-success-dark: #1b5e20;
+
+        --dash-info-bg: #eef5ff;
+
+        --dash-radius-sm: 12px;
+        --dash-radius-md: 16px;
+        --dash-radius-lg: 20px;
+        --dash-radius-xl: 24px;
+
+        --dash-shadow-soft: 0 6px 18px rgba(15, 23, 42, .06);
+        --dash-shadow-card: 0 12px 30px rgba(15, 23, 42, .08);
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Page
+    |--------------------------------------------------------------------------
+    */
+
+    .dashboard-page {
+        min-height: 100%;
+        background: var(--dash-bg);
+    }
+
+    .dashboard-shell {
+        width: 100%;
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: .65rem;
+        display: flex;
+        flex-direction: column;
+        gap: .8rem;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Hero
+    |--------------------------------------------------------------------------
+    */
+
+    .dashboard-hero {
+        position: relative;
+        overflow: hidden;
+
+        border: 1px solid rgba(229, 231, 235, .95);
+        border-radius: var(--dash-radius-lg);
+
+        background:
+            radial-gradient(circle at top left, rgba(25, 118, 210, .08), transparent 34%),
+            linear-gradient(135deg, #ffffff 0%, #f7fbff 100%);
+
+        box-shadow: var(--dash-shadow-soft);
+        padding: .95rem;
+    }
+
+    .dashboard-hero::before {
+        content: "";
+        position: absolute;
+        inset-inline-end: -42px;
+        top: -42px;
+
+        width: 145px;
+        height: 145px;
+
+        background: radial-gradient(
+            circle,
+            rgba(25, 118, 210, .13) 0%,
+            rgba(25, 118, 210, .035) 60%,
+            transparent 72%
+        );
+
+        pointer-events: none;
+    }
+
+    .dashboard-hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .dashboard-title {
+        margin: 0;
+
+        color: var(--dash-text);
+        font-size: 1.05rem;
+        font-weight: 900;
+        line-height: 1.55;
+        letter-spacing: -.02em;
+    }
+
+    .dashboard-subtitle {
+        max-width: 760px;
+        margin: .28rem 0 0;
+
+        color: var(--dash-text-muted);
+        font-size: .76rem;
+        line-height: 1.9;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cards Base
+    |--------------------------------------------------------------------------
+    */
+
+    .dash-card {
+        height: 100%;
+        overflow: hidden;
+
+        border: 1px solid rgba(229, 231, 235, .95);
+        border-radius: var(--dash-radius-lg);
+
+        background: var(--dash-surface);
+        box-shadow: var(--dash-shadow-soft);
+    }
+
+    .dash-card-body {
+        height: 100%;
+        padding: .9rem;
+
+        display: flex;
+        flex-direction: column;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Stat Cards
+    |--------------------------------------------------------------------------
+    */
+
+    .stats-card {
+        position: relative;
+        isolation: isolate;
+        color: #ffffff;
+        border: 0;
+        box-shadow: var(--dash-shadow-card);
+    }
+
+    .stats-card::before {
+        content: "";
+        position: absolute;
+        inset-inline-end: -48px;
+        top: -48px;
+
+        width: 155px;
+        height: 155px;
+        border-radius: 999px;
+
+        background: rgba(255, 255, 255, .13);
+        z-index: -1;
+    }
+
+    .stats-card-primary {
+        background: linear-gradient(135deg, var(--dash-primary) 0%, var(--dash-primary-dark) 100%);
+    }
+
+    .stats-card-success {
+        background: linear-gradient(135deg, var(--dash-success) 0%, var(--dash-success-dark) 100%);
+    }
+
+    .stats-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: .75rem;
+
+        margin-bottom: .65rem;
+    }
+
+    .stats-label {
+        margin: 0;
+
+        font-size: .82rem;
+        font-weight: 800;
+        line-height: 1.75;
+        opacity: .98;
+    }
+
+    .stats-icon {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 14px;
+
+        background: rgba(255, 255, 255, .18);
+        color: #ffffff;
+
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+    }
+
+    .stats-icon .material-symbols-outlined {
+        font-size: 22px;
+        line-height: 1;
+    }
+
+    .stat-number {
+        margin: 0;
+
+        font-size: 2rem;
+        font-weight: 900;
+        line-height: 1.05;
+        letter-spacing: -.04em;
+    }
+
+    .stats-caption {
+        margin: .45rem 0 0;
+
+        font-size: .72rem;
+        line-height: 1.85;
+        opacity: .92;
+    }
+
+    .stat-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: .55rem;
+
+        margin-top: auto;
+        padding-top: 1rem;
+    }
+
+    .stat-actions .btn {
+        min-height: 42px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 12px;
+
+        padding: .62rem .82rem;
+
+        font-size: .78rem;
+        font-weight: 800;
+        line-height: 1.5;
+
+        white-space: normal;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Panel Cards
+    |--------------------------------------------------------------------------
+    */
+
+    .section-head {
+        display: flex;
+        flex-direction: column;
+        gap: .15rem;
+
+        margin-bottom: .85rem;
+    }
+
+    .section-title {
+        margin: 0;
+
+        color: var(--dash-text);
+        font-size: .95rem;
+        font-weight: 900;
+        line-height: 1.6;
+    }
+
+    .section-subtitle {
+        margin: 0;
+
+        color: var(--dash-text-muted);
+        font-size: .74rem;
+        line-height: 1.9;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Latest Event
+    |--------------------------------------------------------------------------
+    */
+
+    .event-summary {
+        padding: .85rem;
+
+        border: 1px solid var(--dash-border);
+        border-radius: var(--dash-radius-md);
+
+        background: var(--dash-surface-soft);
+    }
+
+    .event-badge {
+        width: fit-content;
+
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+
+        margin-bottom: .7rem;
+        padding: .34rem .62rem;
+
+        border-radius: 999px;
+
+        background: var(--dash-info-bg);
+        color: var(--dash-primary-dark);
+
+        font-size: .68rem;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .event-badge .material-symbols-outlined {
+        font-size: 16px;
+        line-height: 1;
+    }
+
+    .event-name {
+        margin: 0 0 .7rem;
+
+        color: var(--dash-text);
+        font-size: .9rem;
+        font-weight: 900;
+        line-height: 1.75;
+
+        word-break: break-word;
+    }
+
+    .event-meta-list {
+        display: grid;
+        gap: .48rem;
+    }
+
+    .event-meta-item {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: start;
+        gap: .7rem;
+
+        padding-bottom: .44rem;
+        border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .event-meta-item:last-child {
+        padding-bottom: 0;
+        border-bottom: 0;
+    }
+
+    .event-meta-label {
+        color: #374151;
+        font-size: .76rem;
+        font-weight: 800;
+        line-height: 1.8;
+        white-space: nowrap;
+    }
+
+    .event-meta-value {
+        color: #4b5563;
+        font-size: .76rem;
+        line-height: 1.8;
+        text-align: left;
+        word-break: break-word;
+    }
+
+    .empty-state {
+        padding: 1.2rem .9rem;
+
+        border: 1px dashed #d1d5db;
+        border-radius: var(--dash-radius-md);
+
+        background: #f8fafc;
+        color: var(--dash-text-muted);
+
+        text-align: center;
+        font-size: .76rem;
+        line-height: 1.95;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | SMS Panel
+    |--------------------------------------------------------------------------
+    */
+
+    .sms-info-box {
+        padding: .9rem;
+        margin-bottom: 1rem;
+
+        border: 1px solid rgba(25, 118, 210, .10);
+        border-radius: var(--dash-radius-md);
+
+        background: rgba(25, 118, 210, .05);
+    }
+
+    .sms-info-head {
+        display: flex;
+        align-items: flex-start;
+        gap: .45rem;
+
+        margin-bottom: .45rem;
+
+        color: var(--dash-primary);
+    }
+
+    .sms-info-head .material-symbols-outlined {
+        font-size: 20px;
+        line-height: 1.25;
+    }
+
+    .sms-info-title {
+        font-size: .78rem;
+        font-weight: 900;
+        line-height: 1.7;
+    }
+
+    .sms-info-text {
+        margin: 0;
+
+        color: #6b7280;
+        font-size: .72rem;
+        line-height: 1.9;
+    }
+
+    .sms-settings-btn {
+        min-height: 44px;
+
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: .45rem;
+
+        width: 100%;
+
+        border: 0;
+        border-radius: 13px;
+
+        background: linear-gradient(135deg, var(--dash-primary) 0%, var(--dash-primary-dark) 100%);
+
+        font-size: .8rem;
+        font-weight: 900;
+        line-height: 1.5;
+    }
+
+    .sms-settings-btn .material-symbols-outlined {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Very Small Phones
+    |--------------------------------------------------------------------------
+    */
+
+    @media (max-width: 359.98px) {
+        .dashboard-shell {
+            padding: .5rem;
+            gap: .68rem;
+        }
+
+        .dashboard-hero {
+            padding: .78rem;
+            border-radius: 16px;
+        }
+
+        .dashboard-title {
+            font-size: .96rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: .7rem;
+        }
+
+        .dash-card {
+            border-radius: 16px;
+        }
+
+        .dash-card-body {
+            padding: .78rem;
+        }
+
+        .stats-label {
+            font-size: .76rem;
+        }
+
+        .stats-icon {
+            width: 36px;
+            height: 36px;
+            min-width: 36px;
+            border-radius: 12px;
+        }
+
+        .stats-icon .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        .stat-number {
+            font-size: 1.65rem;
+        }
+
+        .stats-caption {
+            font-size: .66rem;
+        }
+
+        .stat-actions .btn {
+            min-height: 40px;
+            padding: .58rem .7rem;
+            font-size: .72rem;
+            border-radius: 10px;
+        }
+
+        .section-title {
+            font-size: .86rem;
+        }
+
+        .section-subtitle,
+        .event-meta-label,
+        .event-meta-value,
+        .sms-info-text,
+        .empty-state {
+            font-size: .68rem;
+        }
+
+        .sms-settings-btn {
+            min-height: 40px;
+            font-size: .72rem;
+            border-radius: 10px;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Small Phones / Large Phones
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 576px) {
+        .dashboard-shell {
+            padding: .9rem;
+            gap: .95rem;
+        }
+
+        .dashboard-hero {
+            padding: 1rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.28rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: .82rem;
+        }
+
+        .dash-card-body {
+            padding: 1rem;
+        }
+
+        .stats-label {
+            font-size: .88rem;
+        }
+
+        .stats-icon {
+            width: 44px;
+            height: 44px;
+            min-width: 44px;
+        }
+
+        .stat-number {
+            font-size: 2.25rem;
+        }
+
+        .stats-caption {
+            font-size: .76rem;
+        }
+
+        .stat-actions {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .stat-actions .btn {
+            min-height: 44px;
+            font-size: .82rem;
+        }
+
+        .section-title {
+            font-size: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: .79rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Tablet
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 768px) {
+        .dashboard-shell {
+            padding: 1.05rem;
+            gap: 1.1rem;
+        }
+
+        .dashboard-hero {
+            border-radius: 22px;
+            padding: 1.1rem 1.15rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.48rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: .88rem;
+        }
+
+        .dash-card {
+            border-radius: 20px;
+        }
+
+        .dash-card-body {
+            padding: 1.1rem;
+        }
+
+        .stat-number {
+            font-size: 2.55rem;
+        }
+
+        .section-title {
+            font-size: 1.06rem;
+        }
+
+        .section-subtitle {
+            font-size: .82rem;
+        }
+
+        .event-summary,
+        .sms-info-box {
+            padding: 1rem;
+        }
+
+        .event-name {
+            font-size: .98rem;
+        }
+
+        .event-meta-label,
+        .event-meta-value {
+            font-size: .8rem;
+        }
+
+        .sms-info-title {
+            font-size: .84rem;
+        }
+
+        .sms-info-text {
+            font-size: .77rem;
+        }
+
+        .sms-settings-btn {
+            min-height: 46px;
+            font-size: .84rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Desktop
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 992px) {
+        .dashboard-shell {
+            padding: 1.25rem;
+            gap: 1.25rem;
+        }
+
+        .dashboard-hero {
+            padding: 1.25rem 1.35rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.72rem;
+        }
+
+        .dashboard-subtitle {
+            font-size: .92rem;
+        }
+
+        .dash-card-body {
+            padding: 1.25rem;
+        }
+
+        .stats-label {
+            font-size: .95rem;
+        }
+
+        .stats-icon {
+            width: 48px;
+            height: 48px;
+            min-width: 48px;
+            border-radius: 16px;
+        }
+
+        .stats-icon .material-symbols-outlined {
+            font-size: 25px;
+        }
+
+        .stat-number {
+            font-size: 2.9rem;
+        }
+
+        .stats-caption {
+            font-size: .82rem;
+        }
+
+        .stat-actions .btn {
+            min-height: 46px;
+            font-size: .87rem;
+        }
+
+        .section-title {
+            font-size: 1.12rem;
+        }
+
+        .section-subtitle {
+            font-size: .86rem;
+        }
+
+        .event-name {
+            font-size: 1.04rem;
+        }
+
+        .event-meta-label,
+        .event-meta-value {
+            font-size: .84rem;
+        }
+
+        .sms-settings-btn {
+            min-height: 48px;
+            font-size: .88rem;
+        }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Large Desktop
+    |--------------------------------------------------------------------------
+    */
+
+    @media (min-width: 1200px) {
+        .dashboard-shell {
+            padding: 1.35rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.85rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <h2 class="mb-2">داشبورد دستیار</h2>
-        <p class="text-muted mb-0">نمای کلی از وضعیت سیستم بیزنس لینک</p>
-    </div>
-</div>
+<div class="dashboard-page">
+    <div class="dashboard-shell">
 
-<div class="row g-4 mb-4">
-    <div class="col-12 col-lg-6">
-        <div class="card text-bg-primary shadow-sm h-100 border-0">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
-                <h5 class="card-title mb-3">کل اعضای ثبت شده</h5>
-                <h1 class="display-4 fw-bold mb-3">{{ members_count }}</h1>
+        <!-- Hero -->
+        <section class="dashboard-hero">
+            <div class="dashboard-hero-content">
+                <h1 class="dashboard-title">
+                    داشبورد دستیار
+                </h1>
 
-                <div class="d-flex gap-2 flex-wrap justify-content-center">
-                    <a href="{% url 'member_list' %}" class="btn btn-light text-primary fw-bold">
-                        نمایش لیست افراد
-                    </a>
-                    <a href="{% url 'add_member' %}" class="btn btn-outline-light fw-bold">
-                        ثبت عضو جدید
-                    </a>
-                </div>
+                <p class="dashboard-subtitle">
+                    نمای کلی از وضعیت اعضا، رویدادها و تنظیمات عملیاتی بیزنس لینک
+                </p>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="col-12 col-lg-6">
-        <div class="card text-bg-success shadow-sm h-100 border-0">
-            <div class="card-body d-flex flex-column justify-content-center align-items-center text-center p-4">
-                <h5 class="card-title mb-3">کل رویدادها (مهمانی‌ها)</h5>
-                <h1 class="display-4 fw-bold mb-3">{{ events_count }}</h1>
+        <!-- Stats -->
+        <section class="row g-3 g-lg-4">
 
-                <div class="d-flex gap-2 flex-wrap justify-content-center">
-                    <a href="{% url 'event_list' %}" class="btn btn-light text-success fw-bold">
-                        لیست مهمانی‌ها
-                    </a>
-                    <a href="{% url 'add_event' %}" class="btn btn-outline-light fw-bold">
-                        ایجاد مهمانی جدید
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+            <!-- Members -->
+            <div class="col-12 col-lg-6">
+                <article class="dash-card stats-card stats-card-primary">
+                    <div class="dash-card-body text-center">
 
-<div class="row g-4">
-    <div class="col-12 col-xl-5">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body p-4">
-                <h4 class="fw-bold mb-3">آخرین رویداد برگزارشده</h4>
+                        <div>
+                            <div class="stats-head">
+                                <h2 class="stats-label">
+                                    کل اعضای ثبت‌شده
+                                </h2>
 
-                {% if latest_completed_event %}
-                    <div class="border rounded-3 p-3 bg-light mb-4">
-                        <div class="fw-bold fs-5 mb-2">{{ latest_completed_event.name }}</div>
-                        <div class="text-muted small mb-1">شهر: {{ latest_completed_event.city }}</div>
-                        <div class="text-muted small mb-1">مکان برگزاری: {{ latest_completed_event.venue_name }}</div>
-                        <div class="text-muted small mb-1">تاریخ: {{ latest_completed_event.event_date }}</div>
-                        <div class="text-muted small mb-0">ساعت: {{ latest_completed_event.event_time }}</div>
-                    </div>
+                                <span class="stats-icon" aria-hidden="true">
+                                    <span class="material-symbols-outlined">groups</span>
+                                </span>
+                            </div>
 
-                    <h5 class="fw-bold mb-3">بارگذاری عکس‌های این رویداد</h5>
+                            <div class="stat-number">
+                                {{ members_count }}
+                            </div>
 
-                    <form method="post" action="{% url 'upload_latest_event_gallery' %}" enctype="multipart/form-data">
-                        {% csrf_token %}
-
-                        <div class="mb-3">
-                            <label for="{{ gallery_form.images.id_for_label }}" class="form-label fw-semibold">
-                                انتخاب عکس‌ها
-                            </label>
-                            {{ gallery_form.images }}
-                            {% if gallery_form.images.errors %}
-                                <div class="text-danger small mt-2">
-                                    {{ gallery_form.images.errors }}
-                                </div>
-                            {% endif %}
+                            <p class="stats-caption">
+                                مدیریت اعضا، مشاهده فهرست کامل و ثبت سریع عضو جدید
+                            </p>
                         </div>
 
-                        <button type="submit" class="btn btn-primary px-4">
-                            ثبت عکس‌های رویداد
-                        </button>
-                    </form>
-                {% else %}
-                    <div class="alert alert-warning mb-0">
-                        هنوز رویداد برگزارشده‌ای برای ثبت عکس پیدا نشد.
+                        <div class="stat-actions">
+                            <a href="{% url 'member_list' %}" class="btn btn-light text-primary">
+                                نمایش لیست افراد
+                            </a>
+
+                            <a href="{% url 'add_member' %}" class="btn btn-outline-light">
+                                ثبت عضو جدید
+                            </a>
+                        </div>
+
                     </div>
-                {% endif %}
+                </article>
             </div>
-        </div>
-    </div>
 
-    <div class="col-12 col-xl-7">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                    <div>
-                        <h4 class="fw-bold mb-1">عکس‌های آخرین رویداد</h4>
-                        {% if latest_completed_event %}
-                            <p class="text-muted mb-0 small">
-                                {{ latest_completed_event.name }} | {{ latest_completed_event.city }} | {{ latest_completed_event.event_date }}
+            <!-- Events -->
+            <div class="col-12 col-lg-6">
+                <article class="dash-card stats-card stats-card-success">
+                    <div class="dash-card-body text-center">
+
+                        <div>
+                            <div class="stats-head">
+                                <h2 class="stats-label">
+                                    کل رویدادها و مهمانی‌ها
+                                </h2>
+
+                                <span class="stats-icon" aria-hidden="true">
+                                    <span class="material-symbols-outlined">event</span>
+                                </span>
+                            </div>
+
+                            <div class="stat-number">
+                                {{ events_count }}
+                            </div>
+
+                            <p class="stats-caption">
+                                بررسی رویدادهای ایجادشده و ثبت سریع برنامه جدید
                             </p>
-                        {% endif %}
-                    </div>
-                </div>
+                        </div>
 
-                {% if latest_event_gallery %}
-                    <div class="row g-3">
-                        {% for item in latest_event_gallery %}
-                            <div class="col-6 col-md-4">
-                                <div class="card border-0 shadow-sm h-100">
-                                    <img
-                                        src="{{ item.image.url }}"
-                                        alt="{{ item.title }}"
-                                        class="img-fluid rounded-top"
-                                        style="height: 180px; object-fit: cover;"
-                                    >
-                                    <div class="card-body p-3">
-                                        <div class="fw-semibold small mb-1">{{ item.title }}</div>
-                                        {% if item.city %}
-                                            <div class="text-muted small">{{ item.city }}</div>
-                                        {% endif %}
+                        <div class="stat-actions">
+                            <a href="{% url 'event_list' %}" class="btn btn-light text-success">
+                                لیست مهمانی‌ها
+                            </a>
+
+                            <a href="{% url 'add_event' %}" class="btn btn-outline-light">
+                                ایجاد مهمانی جدید
+                            </a>
+                        </div>
+
+                    </div>
+                </article>
+            </div>
+
+        </section>
+
+        <!-- Panels -->
+        <section class="row g-3 g-lg-4">
+
+            <!-- Latest Completed Event -->
+            <div class="col-12 col-md-6">
+                <article class="dash-card">
+                    <div class="dash-card-body">
+
+                        <div class="section-head">
+                            <h3 class="section-title">
+                                آخرین رویداد برگزارشده
+                            </h3>
+
+                            <p class="section-subtitle">
+                                آخرین رویداد نهایی‌شده را از این بخش مشاهده کن
+                            </p>
+                        </div>
+
+                        {% if latest_completed_event %}
+                            <div class="event-summary">
+                                <span class="event-badge">
+                                    <span class="material-symbols-outlined">verified</span>
+                                    رویداد نهایی‌شده
+                                </span>
+
+                                <h4 class="event-name">
+                                    {{ latest_completed_event.name }}
+                                </h4>
+
+                                <div class="event-meta-list">
+                                    <div class="event-meta-item">
+                                        <span class="event-meta-label">شهر</span>
+                                        <span class="event-meta-value">{{ latest_completed_event.city }}</span>
+                                    </div>
+
+                                    <div class="event-meta-item">
+                                        <span class="event-meta-label">مکان برگزاری</span>
+                                        <span class="event-meta-value">{{ latest_completed_event.venue_name }}</span>
+                                    </div>
+
+                                    <div class="event-meta-item">
+                                        <span class="event-meta-label">تاریخ</span>
+                                        <span class="event-meta-value">{{ latest_completed_event.event_date|to_jalali }}</span>
+                                    </div>
+
+                                    <div class="event-meta-item">
+                                        <span class="event-meta-label">ساعت</span>
+                                        <span class="event-meta-value">{{ latest_completed_event.event_time }}</span>
                                     </div>
                                 </div>
                             </div>
-                        {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                هنوز رویداد برگزارشده‌ای ثبت نشده است.
+                            </div>
+                        {% endif %}
+
                     </div>
-                {% else %}
-                    <div class="border rounded-3 p-4 text-center text-muted bg-light">
-                        هنوز عکسی برای آخرین رویداد ثبت نشده است.
-                    </div>
-                {% endif %}
+                </article>
             </div>
-        </div>
+
+            <!-- SMS Settings -->
+            <div class="col-12 col-md-6">
+                <article class="dash-card">
+                    <div class="dash-card-body">
+
+                        <div>
+                            <div class="section-head">
+                                <h3 class="section-title">
+                                    تنظیمات سامانه پیامکی
+                                </h3>
+
+                                <p class="section-subtitle">
+                                    مدیریت خطوط، اعتبار و الگوهای ارسال پیامک خودکار
+                                </p>
+                            </div>
+
+                            <div class="sms-info-box">
+                                <div class="sms-info-head">
+                                    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+
+                                    <span class="sms-info-title">
+                                        وضعیت اتصال و الگوها
+                                    </span>
+                                </div>
+
+                                <p class="sms-info-text">
+                                    از این بخش می‌توانید اطلاعات اتصال به وب‌سرویس ملی‌پیامک، نام کاربری، رمز عبور،
+                                    خط فرستنده و کد الگوها را برای ارسال خودکار کارت دعوت مهمانان مدیریت کنید.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto">
+                            <a href="{% url 'sms_settings' %}" class="btn btn-primary sms-settings-btn">
+                                <span class="material-symbols-outlined" aria-hidden="true">sms</span>
+                                پیکربندی و تنظیمات پیامک
+                            </a>
+                        </div>
+
+                    </div>
+                </article>
+            </div>
+
+        </section>
+
     </div>
 </div>
 {% endblock %}
